@@ -18,9 +18,9 @@
             Request a tree by {{ event.order_deadline }} to help offset {{ school }}'s paper usage
         </h4>
         <div style="text-align: center">
-            <a href="" class="button" style="display: inline-block">Order a Sapling</a>
+            <a href="#" class="button" style="display: inline-block">Order a Sapling</a>
             {% if event.volunteer_link != 'NULL' and not event.pickup_only %}
-            <a href="" class="button" style="display: inline-block">Volunteer</a>
+            <a href="#" class="button" style="display: inline-block">Volunteer</a>
             {% endif %}
         </div>
     </div>
@@ -94,7 +94,7 @@
                             </p>
                         {% endif %}
                     </div>
-                    <a href="" class="button">Order a Sapling</a>
+                    <a href="#" class="button">Order a Sapling</a>
                 </div>
                 {% if event.volunteer_link != 'NULL' and not event.pickup_only%}
                 <div class="card min2">
@@ -104,7 +104,7 @@
                             Volunteer to plant saplings around your community on {{ event.date }}.
                         </p>
                     </div>
-                    <a href="" class="button">Sign Up to Volunteer</a>
+                    <a href="#" class="button">Sign Up to Volunteer</a>
                 </div>
                 {% endif %}
                 <div class="card min2">

@@ -7,6 +7,7 @@ eventData = {
     'text': 'About Us text here', 
     'video': '', 
     'display_email': 'displayemail@gmail.com', 
+    'pickup_only': False,
     'hosts': [
         {
             'name': 'Host1 Name', 

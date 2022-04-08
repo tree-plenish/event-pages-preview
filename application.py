@@ -42,6 +42,11 @@ def process_data(form):
     data['text'] = form['text']
     data['video'] = form['video']
     data['display_email'] = form['display_email']
+
+    if form['pickup_only'] == 'True':
+        data['pickup_only'] = True
+    else:
+        data['pickup_only'] = False
     return data
 
 if __name__ == "__main__":
