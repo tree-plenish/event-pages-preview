@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
+{% endblock %}
+{% block body %}
+<div class="form-body">
+    <div class="row">
+      <div class="col">
+  
+        <h1>Sign up</h1>
+        <hr>
+  
+        <form action="{{ url_for('preview') }}" method="POST" enctype="multipart/form-data">
+  
+          <div class="form-group">
+            <label>School Name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter school name">
+          </div>
+          <div class="form-group">
+            <label>School State</label>
+            <input type="text" class="form-control" id="state" name="state" placeholder="Enter school state">
+          </div>
+          <div class="form-group">
+            <label>Event Date</label>
+            <input type="date" class="form-control" id="date" name="date" placeholder="Select event date">
+          </div>
+
+          <div class="form-group">
+            <label>"About Us" Media Type</label>
+            <input type="radio" id="text" name="media_type" value="Text">
+            <label for="Text">Text</label><br>
+            <input type="radio" id="video" name="media_type" value="Video">
+            <label for="Video">Video</label><br>
+          </div>
+          <div class="form-group">
+            <label>Text</label>
+            <input type="text" class="form-control" id="text" name="text" placeholder="About Us Text">
+          </div>
+          <div class="form-group">
+            <label>Video</label>
+            <input type="text" class="form-control" id="video" name="video" placeholder="About Us Video Link">
+          </div>
+  
+          <div class="form-group">
+            <label>Display Email</label>
+            <input type="email" class="form-control" id="display_email" name="display_email" placeholder="Enter contact email to display">
+          </div>
+  
+          <h3>Host 1</h3>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="form-control" id="host1name" name="hosts[host1][name]" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <input type="text" class="form-control" id="host1bio" name="hosts[host1][bio]" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Photo</label>
+            <input type="text" class="form-control" id="host1photo" name="hosts[host1][photo]" placeholder="">
+          </div>
+
+          <h3>Host 2</h3>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="form-control" id="host2name" name="hosts[host2][name]" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Bio</label>
+            <input type="text" class="form-control" id="host1bio" name="hosts[host2][bio]" placeholder="">
+          </div>
+          <div class="form-group">
+            <label>Photo</label>
+            <input type="text" class="form-control" id="host1photo" name="hosts[host2][photo]" placeholder="">
+          </div>
+  
+          <button type="submit" class="btn btn-primary">Preview Event Page</button>
+  
+        </form>
+  
+      </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{% endblock %}

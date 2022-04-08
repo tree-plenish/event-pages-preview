@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>{{ school }} | Tree-Plenish Events</title>
+{% endblock %}
+
+{% block body %}
+<div id="title">
+    <div class="overImage">
+        <h1 id="mainTitle">Tree-Plenish.</h1>
+        <h1>Striving for Sustainability at {{ school }}</h1>
+        <hr />
+        <div>
+            <h4 style="display: inline-block">{{ event.date }}</h4>
+            <h4 style="display: inline-block; float: right">{{ event.state }}</h4>
+        </div>
+        <h4 style="text-align: center; margin: 5% 10%; line-height: 1.5em">
+            Request a tree by {{ event.order_deadline }} to help offset {{ school }}'s paper usage
+        </h4>
+        <div style="text-align: center">
+            <a href="" class="button" style="display: inline-block">Order a Sapling</a>
+            {% if event.volunteer_link != 'NULL' and not event.pickup_only %}
+            <a href="" class="button" style="display: inline-block">Volunteer</a>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<div id="goalMsg">
+    <h1>A Message from Our Team</h1>
+    <hr />
+    {% if event.media_type == 'Video' or  event.media_type == 'Text' %}
+    {% if event.media_type == 'Video' and event.video %}
+        {% if 'youtube' in event.video %}
+            <div class="video-container">
+                <iframe 
+                    src="{{ event.video }}" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        {% elif 'drive.google.com' in event.video %}
+        <div class="video-container">
+            <iframe src="{{ event.video }}" allowfullscreen></iframe>
+        </div>
+        {% endif %}
+    {% else %}
+        <p>{{ event.text }}</p>
+    {% endif %}
+    {% endif %}
+    
+</div>
+
+
+<div id="goalMetrics">
+    <!-- <div class="overImage"> -->
+        <h1>Our Goal</h1>
+        <hr />
+        <div class="split">
+            <div class="half">
+                <h1>{{ event.tree_goal }}</h1>
+                <p>Trees</p>
+            </div>
+            <div class="half">
+                <h1 style="display: inline">{{ "%.1f"|format(event.tree_goal*0.01|float) }}</h1><h3 style="display: inline"> million</h3>
+                <p>Sheets of Paper Replaced</p>
+            </div>
+        </div>
+    <!-- </div> -->
+    
+</div>
+
+<div id="howToParticipate">
+    <div class="overImage" style="padding: 7% 5%">
+        <h1>How to Participate</h1>
+        <hr />
+
+        <div class="centered">
+            <div class="cards" style="padding: 0">
+                <div class="card min2 min4">
+                    <div class="top">
+                        <h3>Order a Sapling</h3>
+                        {% if not event.pickup_only %}
+                            <p>
+                                Order a sapling to be planted in your yard by volunteers
+                                on {{ event.date }}.
+                            </p>
+                        {% else %}
+                            <p>
+                                Order a sapling to be picked up on {{ event.date }}.
+                            </p>
+                        {% endif %}
+                    </div>
+                    <a href="" class="button">Order a Sapling</a>
+                </div>
+                {% if event.volunteer_link != 'NULL' and not event.pickup_only%}
+                <div class="card min2">
+                    <div class="top">
+                        <h3>Volunteer</h3>
+                        <p>
+                            Volunteer to plant saplings around your community on {{ event.date }}.
+                        </p>
+                    </div>
+                    <a href="" class="button">Sign Up to Volunteer</a>
+                </div>
+                {% endif %}
+                <div class="card min2">
+                    <div class="top">
+                        <h3>Support</h3>
+                        <p>
+                            Share this event around your community or donate to Tree-Plenish to help future events.
+                        </p>
+                    </div>
+                    <a href="https://www.tree-plenish.org/donate"
+                        class="button" >Donate to Tree-Plenish</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="trees">
+    <h1 class="divHead">Our {{ event.trees|length }} Trees</h1>
+    <div  class="stiffCards">
+        {% for tree in event.trees %}
+            <div class="stiffCard">
+                {% if tree.image_link != "NULL" %}
+                <img src="{{ tree.image_link }}" class="treeImg" alt="{{ tree.name }}">
+                {% endif %}
+                <div class="container">
+
+                    <h2>{{ tree.name }}</h2>
+
+                    {% if tree.description_link != "NULL" %}
+                    <a href="{{ tree.description_link }}" class="button">Learn More</a>
+                    {% endif %}
+                    {# <p>{{ tree.description }}</p> #}
+                </div>
+            </div>
+        {% endfor %}
+    </div> 
+    {# <h3>Visit the Resources page for more info!</h3> #}
+</div>
+
+
+<div id="team">
+    <h1 class="divHead">Meet The Team</h1>
+    <h3>Contact us with any questions!</h3>
+    <h4><a class="email" href="mailto:{{ event.display_email }}">{{ event.display_email }}</a></h4>
+    <div class="centered">
+        <div class="cards">
+            {% for person in event.hosts %}
+                <div class="card {{'min3' if event.host_names|length >= 3}} {{'min2' if event.host_names|length >= 2}}">
+                    <div class="circleCropper" style="background-image: url({{ person.photo }})">
+                    </div>
+                    <div class="container">
+                        <h2>{{ person.name }}</h2>
+                        <p>{{ person.bio }}</p> 
+                        <!-- <p>{{ person.phone }}</p>
+                        <p>{{ person.email }}</p>-->
+                    </div>
+                    
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+
+</div>
+
+{% if event.sponsors %}
+<div id="sponsors">
+    <h1>Our Sponsors</h1>
+    <hr />
+    <div style="margin:auto; text-align: center; ">
+        {# {% for sponsor in event.sponsors %}
+        <div style="background-color: #80ba52; display: inline-block; margin:2em">
+            <a href="{{sponsor.link}}"><img src="{{ sponsor.logo_link }}"  title="{{ sponsor.name }}" alt="{{ sponsor.name }}" style="width:200px"></a>
+        </div> #}
+        {% for level in event.sponsors %}
+        {% for sponsor in event.sponsors[level] %}
+            {% if sponsor.logo %}
+                <div class="logo">
+                    <img src="{{ sponsor.logo_link }}"  title="{{ sponsor.name }}" alt="{{ sponsor.name }}" style="width:250px">
+                </div> 
+            {% else %}
+                <p id="{{ level }}">{{ sponsor.name }}</p>
+            {% endif %}
+        {% endfor %}
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+
+<div id="workSupport">
+    <div class="split">
+        <div class="half" style="background-color: rgba(54, 83, 79, 0.678);">
+            <h2>Work With Tree-Plenish!</h2>
+            <p>Fill out this interest form if you are interested in hosting an event at your school next year!</p>
+            <a href="https://treeplenish.typeform.com/to/nI65YnNu" class="button">Host an Event</a>
+        </div>
+        <div class="half"style="background-color: rgba(0,0,0,0.4);">
+            <h2>Support Tree-Plenish!</h2>
+            <p>Help Tree-Plenish build sustainable communities across the country!</p>
+            <a href="https://www.tree-plenish.org/donate" class="button">Donate!</a>
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

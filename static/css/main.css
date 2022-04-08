@@ -1,0 +1,469 @@
+body{
+    margin: 0px;
+    font-family: 'Montserrat', Arial,Helvetica,sans-serif;
+    position: relative;
+}
+
+a{
+    text-decoration: none;
+}
+#main{
+    z-index: -100;
+}
+#mapid{
+    z-index: 0;
+}
+#topnav{
+    z-index: 100;
+    position: relative;
+}
+#topnav ul{
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #016d30;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    color: white;
+    font-size: 3.5vw;
+}
+#topnav ul li{
+
+    display: inline;
+    float: left;
+    padding: 5%;
+}
+#topnav ul li:not(#topnav-title) a:hover{
+    color:#80ba52;
+}
+#topnav-title{
+    background-color: #80ba52;
+    font-weight: bold;
+}
+#topnav ul li a:link, a:active,  a:visited{
+    color: white;
+}
+/* Hide the link that should open and close the topnav on small screens */
+#topnav .icon {
+    display: none;
+}
+/* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
+@media screen and (max-width: 600px) {
+    #topnav li:not(:first-child) {display: none;}
+    #topnav a.icon {
+      float: right;
+      display: block;
+      color: white;
+      padding: 20px;
+    }
+  }
+  
+/* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */
+@media screen and (max-width: 600px) {
+    #topnav.responsive {position: relative;}
+    #topnav.responsive a.icon {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+    #topnav.responsive li {
+        float: none;
+        display: block;
+        text-align: left;
+    }
+
+}
+
+@media screen and (min-width: 500px) {/*large screens*/
+    #topnav ul {
+        font-size: 1.1em;
+    }
+    #topnav ul li {
+        padding: 20px;
+    }
+}
+#main{
+    text-align: center;
+}
+#main-header{
+    background-image: url(../images/leaves.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    color: white;
+    padding-top: 60px;
+}
+#main-header h1{
+    padding: 15%;
+    margin: 0;
+    font-size: 2.5em;
+    background-color: rgba(54, 83, 79, 0.678);
+}
+
+#title{
+    background-image: url("../images/planting.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); */
+    font-size: 0.8em; /*small screens*/
+    text-align: left;
+}
+#mainTitle{
+    font-size: 2.5em;
+    padding: 5% 0 2% 0;
+}
+@media screen and (min-width: 660px) {/*large screens*/
+    #title {
+        font-size: 2vw; 
+    }
+}
+hr{
+    border: 0;
+    border-top: 1px solid white;
+}
+
+#goalMsg{
+    background-color: #80ba52;
+    padding: 10% 15%;
+    text-align: left;
+    color: white;
+    line-height: 2em;
+}
+
+
+
+.button{
+    transition: 0.5s;
+    padding: 10px 20px;
+    border: none;
+    background-color: #80ba52;
+    color: white;
+    display: block;
+    font-size: 1em;
+    padding: 2% 4%;
+    margin: 4%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #80ba52;
+}
+.button:hover{
+    background-color: rgba(0,0,0,0);
+    border-color: white;
+    
+}
+
+#footer{
+    text-align: center;
+    background-color: #016d30;
+    padding: 40px;
+    position: relative;
+    bottom: 0;
+    /* height: 100px; */
+    margin: 0;
+    color:#80ba52;
+}
+#footer h1{
+    color: white;
+}
+.circleCropper{
+    width: 200px;
+    height: 200px;
+    /* position: relative; */
+    overflow: hidden;
+    border-radius: 50%;
+    margin: auto;
+    background-size: cover;
+    background-position: center top;
+}
+.landscape{
+    height: 100%;
+    width: auto;
+}
+.portrait{
+    height: auto;
+    width: 100%;
+}
+.profileImg{
+    display: inline;
+    margin: 0 auto;
+    
+}
+/* Assuming tree images are all cropped to same size? */
+.treeImg{
+    width: 100%;
+    height: 300px;
+    border-radius: 6px 6px 0 0;
+    object-fit: cover;
+}
+/* tree cards (Stiff cards) */
+.stiffCards{
+    padding: 6% 2%;
+}
+.stiffCards h1{
+    padding: 5%;
+}
+.stiffCard{
+    background-color: white;
+    color: black;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    margin: 10px;
+    width: 250px;
+    border-radius: 6px;
+    display: inline-block;
+    
+}
+.stiffCard:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+.stiffCard .button:hover{
+    background-color:#016d30;
+}
+.container {
+    padding: 2px 16px;
+    flex-grow: 1;
+    padding: 0% 3%;
+}
+
+@media screen and (min-width: 992px) {
+    #howToParticipate, #goalMetrics, #workSupport {
+        background-attachment: fixed;
+    }
+}
+
+#howToParticipate{
+    background-image: url("../images/trees-sky.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+    /* font-size: 2vw; */
+    line-height: 2em;    
+}
+#howToParticipate p, #howToParticipate h3{
+    text-align: left;
+}
+#howToParticipate h1 {
+    font-size: 3em;
+    margin-bottom: 0.8em;
+    line-height: 1.2em;
+}
+#howToParticipate hr {
+    border-color:#80ba52;
+    border-width:1em;
+    width:20%;
+    /* margin: 3%; */
+}
+#howToParticipate .button{
+    display: inline-block;
+}
+.overImage{
+    background-color: rgba(0, 0, 0, 0.404);
+    color: white;
+    padding: 100px 15%;
+    
+}
+#goalMetrics{
+    /* background-image: url("../images/trees-foliage.jpg"); */
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: rgb(205,232,198);
+    color: #2c7a4e;
+    padding: 100px 15%;
+    /* background-attachment: fixed; */
+    /* background-color: #016d30; */
+    /* padding: 8% 10%; */
+    text-align: left;
+    /* color: white; */
+}
+#goalMetrics h1{
+    font-size: 3em;
+}
+#goalMetrics .split h1{
+    font-size: 6em;
+}
+#goalMetrics p, h1{
+    padding: 0;
+    margin: 0;
+}
+#goalMetrics p, h3{
+    font-size: 1.5em;
+}
+#goalMetrics hr{
+    border-color: #2c7a4e;
+
+}
+#workSupport{
+    background-image: url(../images/leaves.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    /* background-attachment: fixed; */
+    color: white;
+}
+#trees{
+    /* background-color: #016d30; */
+    color: white;
+    padding-bottom:5%;
+    background-color: #2c7a4e;
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='88' height='24' viewBox='0 0 88 24'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='autumn' fill='%23016d30' fill-opacity='0.77'%3E%3Cpath d='M10 0l30 15 2 1V2.18A10 10 0 0 0 41.76 0H39.7a8 8 0 0 1 .3 2.18v10.58L14.47 0H10zm31.76 24a10 10 0 0 0-5.29-6.76L4 1 2 0v13.82a10 10 0 0 0 5.53 8.94L10 24h4.47l-6.05-3.02A8 8 0 0 1 4 13.82V3.24l31.58 15.78A8 8 0 0 1 39.7 24h2.06zM78 24l2.47-1.24A10 10 0 0 0 86 13.82V0l-2 1-32.47 16.24A10 10 0 0 0 46.24 24h2.06a8 8 0 0 1 4.12-4.98L84 3.24v10.58a8 8 0 0 1-4.42 7.16L73.53 24H78zm0-24L48 15l-2 1V2.18A10 10 0 0 1 46.24 0h2.06a8 8 0 0 0-.3 2.18v10.58L73.53 0H78z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+#sponsors{
+    background-color: #80ba52;
+    padding: 5% 15%;
+    text-align: left;
+    color: white;
+    line-height: 2em;
+
+}
+#sponsors .logo{
+    background-color: #80ba52; 
+    display: inline-block; 
+    margin:2em;
+}
+
+#sponsors p {
+    line-height: 1.2em;
+}
+
+#sponsors #redwood{
+    font-size: 50px;
+}
+#sponsors #maple{
+    font-size: 40px;
+}
+#sponsors #seedling{
+    font-size: 30px;
+}
+#sponsors #individual{
+    font-size: 20px;
+}
+
+.divHead{
+    padding-top: 5%;
+    font-size: 60px;
+}
+/* Flexbox styling for profile and how to participate cards */
+
+.card {
+    /* background-color: white; */
+    margin-bottom: 2em; 
+
+    /* For .top to take up as much space as possible*/
+    display: flex;
+    flex-direction: column;
+}
+
+.card a {
+    /* color: black; */
+    text-decoration: none;
+}
+
+.card .top {
+    flex-grow: 1;
+    padding: 0% 3%;
+}
+/* .card a:hover {
+    box-shadow: 3px 3px 8px hsl(0, 0%, 80%);
+} */
+
+.card-content {
+    padding: 1.4em;
+}
+
+.card-content h2 {
+    margin-top: 0;
+    margin-bottom: .5em;
+    font-weight: bold;
+}
+
+.card-content p {
+    font-size: 80%;
+}
+.cards {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 3% 8%;
+    justify-content: center;
+ }
+/*1 card*/
+.card {
+    flex: 1 0 250px; /*size on small screens*/
+    box-sizing: border-box;
+    margin: 1rem .25em;
+    padding: 0 2%;
+    
+}
+
+/*2 cards how to participate*/
+@media screen and (max-width: 1200px) {
+    #howToParticipate .min2 { 
+       min-width: calc(50% -  1em);
+    }
+}
+/*2 cards*/
+@media screen and (min-width: 45em) {
+    .min2 { /*only apply 2 cards per row if min 2 team members*/
+       max-width: calc(50% -  1em);
+    }
+}
+/*3 cards*/ 
+@media screen and (min-width: 68em) {
+    .min3 { /*only apply 3 cards per row if min 3 team members*/
+        max-width: calc(34% - 1em);
+    }
+}
+
+.centered {
+    margin: 0 auto; 
+    padding: 0 1em;
+}
+
+@media screen and (min-width: 70em) {
+    .centered {
+        max-width: 70em;
+    }
+}
+/* for two-flexbox layout */
+.split{
+    display: flex;
+    flex-wrap: wrap;
+}
+.half{
+    flex: 1 0 100%; /*size on small screens*/
+    box-sizing: border-box;
+    padding: 8%;
+    font-size: 1.3em;
+}
+/*2 cards*/
+@media screen and (min-width: 850px) {
+    .half {
+       max-width: 50%;
+       font-size: 1.5vw;
+       padding: 5%
+    }
+}
+
+.video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+}
+.video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.email {
+    color: #2c7a4e;
+}
+
+.email:hover {
+    text-decoration: underline;
+}
