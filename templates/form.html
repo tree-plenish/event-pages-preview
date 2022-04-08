@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col">
   
-        <h1>Sign up</h1>
+        <h1>Event Pages Information</h1>
         <hr>
   
         <form action="{{ url_for('preview') }}" method="POST" enctype="multipart/form-data">
@@ -60,33 +60,26 @@
             <input type="email" class="form-control" id="display_email" name="display_email" placeholder="Enter contact email to display">
           </div>
   
-          <h3>Host 1</h3>
-          <div class="form-group">
-            <label>Name</label>
-            <input type="text" class="form-control" id="host1name" name="hosts[host1][name]" placeholder="">
-          </div>
-          <div class="form-group">
-            <label>Bio</label>
-            <input type="text" class="form-control" id="host1bio" name="hosts[host1][bio]" placeholder="">
-          </div>
-          <div class="form-group">
-            <label>Photo</label>
-            <input type="text" class="form-control" id="host1photo" name="hosts[host1][photo]" placeholder="">
-          </div>
 
-          <h3>Host 2</h3>
-          <div class="form-group">
-            <label>Name</label>
-            <input type="text" class="form-control" id="host2name" name="hosts[host2][name]" placeholder="">
+          <div id="host-fields">
+            <div class="host-field">
+              <h4>Host 1</h4>
+              <div class="form-group">
+                <label>Name</label>
+                <input type="text" class="form-control" name="host1_name" placeholder="">
+              </div>
+              <div class="form-group">
+                <label>Bio</label>
+                <input type="text" class="form-control" name="host1_bio" placeholder="">
+              </div>
+              <div class="form-group">
+                <label>Photo</label>
+                <input type="text" class="form-control" name="host1_photo" placeholder="">
+              </div>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Bio</label>
-            <input type="text" class="form-control" id="host1bio" name="hosts[host2][bio]" placeholder="">
-          </div>
-          <div class="form-group">
-            <label>Photo</label>
-            <input type="text" class="form-control" id="host1photo" name="hosts[host2][photo]" placeholder="">
-          </div>
+          <button type="button" id="add-host-fields">Add Host</button>
+          <button type="button" id="remove-host-fields">Remove Host</button>
   
           <button type="submit" class="btn btn-primary">Preview Event Page</button>
   
@@ -97,4 +90,5 @@
 </div>
 {% endblock %}
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/form.js') }}"></script>
 {% endblock %}

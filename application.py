@@ -47,7 +47,19 @@ def process_data(form):
         data['pickup_only'] = True
     else:
         data['pickup_only'] = False
+
+    data['hosts'] = []
+    i = 1
+    while 'host' + str(i) + '_name' in form:
+        data['hosts'].append({
+            'name' : form['host' + str(i) + '_name'],
+            'bio' : form['host' + str(i) + '_bio'],
+            'photo' : form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
+        })
+        i += 1
+
     return data
+
 
 if __name__ == "__main__":
     application.run()
