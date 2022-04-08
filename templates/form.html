@@ -8,7 +8,7 @@
     <div class="row">
       <div class="col">
   
-        <h1>Event Pages Information</h1>
+        <h1>Event Page Information</h1>
         <hr>
   
         <form action="{{ url_for('preview') }}" method="POST" enctype="multipart/form-data">
@@ -28,10 +28,13 @@
 
           <div class="form-group">
             <label>Event Type</label>
-            <input type="radio" id="text" name="pickup_only" value="True">
-            <label for="True">Pickup Only</label><br>
-            <input type="radio" id="video" name="pickup_only" value="False">
-            <label for="False">Volunteer Planting</label><br>
+            <br>
+            <div class="radio-group">
+              <input type="radio" id="text" name="pickup_only" value="True">
+              <label for="True">Pickup Only</label>
+              <input type="radio" id="video" name="pickup_only" value="False">
+              <label for="False">Volunteer Planting</label>
+            </div>
           </div>
 
           <div class="form-group">
@@ -41,10 +44,13 @@
 
           <div class="form-group">
             <label>"About Us" Media Type</label>
-            <input type="radio" id="text" name="media_type" value="Text">
-            <label for="Text">Text</label><br>
-            <input type="radio" id="video" name="media_type" value="Video">
-            <label for="Video">Video</label><br>
+            <br>
+            <div class="radio-group">
+              <input type="radio" id="text" name="media_type" value="Text">
+              <label for="Text">Text</label>
+              <input type="radio" id="video" name="media_type" value="Video">
+              <label for="Video">Video</label>
+            </div>
           </div>
           <div class="form-group">
             <label>Text</label>
@@ -81,7 +87,17 @@
           <button type="button" id="add-host-fields">Add Host</button>
           <button type="button" id="remove-host-fields">Remove Host</button>
           <!-- <p><img id="output" width="200" /></p> -->
-          <button type="submit" class="btn btn-primary">Preview Event Page</button>
+
+          <div id="tree-fields">
+            <div class="form-group">
+              <label>Tree 1 Species</label>
+              <input type="text" class="form-control" name="tree1_species" placeholder="">
+            </div>
+          </div>
+          <button type="button" id="add-tree-fields">Add Tree</button>
+          <button type="button" id="remove-tree-fields">Remove Tree</button>
+
+          <button type="submit">Preview Event Page</button>
   
         </form>
   

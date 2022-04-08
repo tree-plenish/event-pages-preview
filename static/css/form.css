@@ -1,3 +1,42 @@
 .form-body {
-    margin: 20%;
+    margin: 10%;
+    margin-top:130px;
+}
+
+button {
+    transition: 0.5s;
+    padding: 10px 20px;
+    border: none;
+    background-color: #80ba52;
+    color: white;
+    display: inline-block;
+    font-size: 1em;
+    padding: 2% 4%;
+    margin: 4%;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #80ba52;
+}
+button:hover{
+    background-color: #016d30;
+    border-color: white;
+    
+}
+
+.radio-group, input[type=text], input[type=number], input[type=date], input[type=email], input[type=file] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+/* 
+.radio-group {
+    padding: 1%;
+} */
+
+.form-group {
+    padding: 1%;
 }

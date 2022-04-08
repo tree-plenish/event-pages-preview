@@ -36,7 +36,7 @@ def preview():
 
 def process_data(form, files):
     print(form)
-    print(files)
+    # print(files)
     
     data = {}
     data['name'] = form['name']
@@ -51,6 +51,14 @@ def process_data(form, files):
     data['media_type'] = form['media_type']
     data['text'] = form['text']
     data['video'] = form['video']
+    if 'youtu.be' in data['video']:
+        data['video'] = "https://www.youtube.com/embed/" + data['video'].split('.be/',1)[1].split('&')[0]
+    elif 'youtube.com/watch?' in data['video']:
+        data['video'] = "https://www.youtube.com/embed/" + data['video'].split('/watch?v=',1)[1].split('&')[0]
+    elif 'drive.google.com' in data['video']:
+        data['video'] = data['video'].replace('view','preview')
+
+
     data['display_email'] = form['display_email']
 
     if form['pickup_only'] == 'True':
@@ -76,7 +84,17 @@ def process_data(form, files):
         })
         i += 1
 
-    print(data)
+    data['trees'] = []
+    i = 1
+    while 'tree' + str(i) + '_species' in form:
+        data['trees'].append({
+            'name' : form['tree' + str(i) + '_species'],
+            'image_link' : 'static/images/default_tree.png',
+            'description_link': ''
+        })
+        i += 1
+
+    # print(data)
     return data
 
 
