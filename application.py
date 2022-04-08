@@ -1,5 +1,8 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, abort
 from data import eventData
+from werkzeug.utils import secure_filename
+import os
+import base64
 
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -7,6 +10,10 @@ from dateutil.relativedelta import relativedelta
 application = Flask(__name__)
 
 application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+application.config['MAX_CONTENT_PATH'] = 1024*1024*1024
+application.config['UPLOAD_PATH'] = 'static/uploads'
+application.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
+
 
 #home page
 @application.route('/index')
@@ -22,12 +29,15 @@ def school():
 @application.route("/preview", methods=["GET", "POST"])
 def preview():
     if request.method == "POST":
-        data = process_data(request.form)
+        data = process_data(request.form, request.files)
         return render_template("school_event.html", event=data, school=data['name'])
     else:
         return redirect('/')
 
-def process_data(form):
+def process_data(form, files):
+    print(form)
+    print(files)
+    
     data = {}
     data['name'] = form['name']
     data['state'] = form['state']
@@ -51,13 +61,22 @@ def process_data(form):
     data['hosts'] = []
     i = 1
     while 'host' + str(i) + '_name' in form:
+        # f = request.files['host' + str(i) + '_photo']
+        # filename = secure_filename(f.filename)
+        # if filename != '':
+        #     file_ext = os.path.splitext(filename)[1]
+        #     if file_ext not in application.config['UPLOAD_EXTENSIONS']:
+        #         abort(400)
+        #     f.save(os.path.join(application.config['UPLOAD_PATH'], filename))
         data['hosts'].append({
             'name' : form['host' + str(i) + '_name'],
             'bio' : form['host' + str(i) + '_bio'],
-            'photo' : form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
+            'photo': 'data:image/jpeg;base64,' + base64.b64encode(files['host' + str(i) + '_photo'].read()).decode() if files['host' + str(i) + '_photo'].filename != '' else 'static/images/default_profile.png'
+            # 'photo' : 'static/uploads/' + filename if filename != '' else 'static/images/default_profile.png'
         })
         i += 1
 
+    print(data)
     return data
 
 
