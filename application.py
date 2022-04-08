@@ -1,9 +1,8 @@
-import copy
 from flask import Flask, render_template, request, redirect
-import pandas as pd
-from os import path
-import pickle
 from data import eventData
+
+import datetime
+from dateutil.relativedelta import relativedelta
 
 application = Flask(__name__)
 
@@ -23,8 +22,27 @@ def school():
 @application.route("/preview", methods=["GET", "POST"])
 def preview():
     if request.method == "POST":
-        print(request.form)
-        return render_template("test.html", data=request.form)
+        data = process_data(request.form)
+        return render_template("school_event.html", event=data, school=data['name'])
+    else:
+        return redirect('/')
+
+def process_data(form):
+    data = {}
+    data['name'] = form['name']
+    data['state'] = form['state']
+
+    date = datetime.datetime.strptime(form['date'], '%Y-%m-%d').date()
+    date_minus_month =  date - relativedelta(months=1)
+    data['order_deadline'] = date_minus_month.strftime('%B %d, %Y').replace(" 0", " ")
+    data['date'] = date.strftime('%B %d, %Y').replace(" 0", " ")
+    
+    data['tree_goal'] = int(form['tree_goal'])
+    data['media_type'] = form['media_type']
+    data['text'] = form['text']
+    data['video'] = form['video']
+    data['display_email'] = form['display_email']
+    return data
 
 if __name__ == "__main__":
     application.run()
