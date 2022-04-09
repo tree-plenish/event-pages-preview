@@ -40,3 +40,7 @@ button:hover{
 .form-group {
     padding: 1%;
 }
+
+#text-group, #video-group {
+    display: none;
+}

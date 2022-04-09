@@ -15,55 +15,55 @@
   
           <div class="form-group">
             <label>School Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter school name">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter school name" required>
           </div>
           <div class="form-group">
             <label>School State</label>
-            <input type="text" class="form-control" id="state" name="state" placeholder="Enter school state">
+            <input type="text" class="form-control" id="state" name="state" placeholder="Enter school state" required>
           </div>
           <div class="form-group">
             <label>Event Date</label>
-            <input type="date" class="form-control" id="date" name="date" placeholder="Select event date">
+            <input type="date" class="form-control" id="date" name="date" placeholder="Select event date" required>
           </div>
 
           <div class="form-group">
             <label>Event Type</label>
             <br>
             <div class="radio-group">
-              <input type="radio" id="text" name="pickup_only" value="True">
+              <input type="radio" id="text" name="pickup_only" value="True" required>
               <label for="True">Pickup Only</label>
-              <input type="radio" id="video" name="pickup_only" value="False">
+              <input type="radio" id="video" name="pickup_only" value="False" required>
               <label for="False">Volunteer Planting</label>
             </div>
           </div>
 
           <div class="form-group">
             <label>Tree Goal</label>
-            <input type="number" class="form-control" id="tree_goal" name="tree_goal" placeholder="Enter tree goal">
+            <input type="number" class="form-control" id="tree_goal" name="tree_goal" placeholder="Enter tree goal" required>
           </div>
 
           <div class="form-group">
             <label>"About Us" Media Type</label>
             <br>
             <div class="radio-group">
-              <input type="radio" id="text" name="media_type" value="Text">
+              <input type="radio" id="text" name="media_type" onchange="selectMediaType(this);" value="Text" required>
               <label for="Text">Text</label>
-              <input type="radio" id="video" name="media_type" value="Video">
+              <input type="radio" id="video" name="media_type" onchange="selectMediaType(this);" value="Video" required>
               <label for="Video">Video</label>
             </div>
           </div>
-          <div class="form-group">
-            <label>Text</label>
-            <input type="text" class="form-control" id="text" name="text" placeholder="About Us Text">
+          <div class="form-group" id="text-group">
+            <label id="text-text">Text</label>
+            <input type="text" class="form-control" id="text-box" name="text" placeholder="About Us Text">
           </div>
-          <div class="form-group">
-            <label>Video</label>
-            <input type="text" class="form-control" id="video" name="video" placeholder="About Us Video Link">
+          <div class="form-group" id="video-group">
+            <label id="video-text">Video</label>
+            <input type="text" class="form-control" id="video-box" name="video" placeholder="About Us Video Link">
           </div>
   
           <div class="form-group">
             <label>Display Email</label>
-            <input type="email" class="form-control" id="display_email" name="display_email" placeholder="Enter contact email to display">
+            <input type="email" class="form-control" id="display_email" name="display_email" placeholder="Enter contact email to display" required>
           </div>
   
 
@@ -72,11 +72,11 @@
               <h4>Host 1</h4>
               <div class="form-group">
                 <label>Name</label>
-                <input type="text" class="form-control" name="host1_name" placeholder="">
+                <input type="text" class="form-control" name="host1_name" placeholder="" required>
               </div>
               <div class="form-group">
                 <label>Bio</label>
-                <input type="text" class="form-control" name="host1_bio" placeholder="">
+                <input type="text" class="form-control" name="host1_bio" placeholder="" required>
               </div>
               <div class="form-group">
                 <label>Photo</label>
@@ -91,7 +91,7 @@
           <div id="tree-fields">
             <div class="form-group">
               <label>Tree 1 Species</label>
-              <input type="text" class="form-control" name="tree1_species" placeholder="">
+              <input type="text" class="form-control" name="tree1_species" placeholder="" required>
             </div>
           </div>
           <button type="button" id="add-tree-fields">Add Tree</button>
