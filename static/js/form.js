@@ -128,7 +128,7 @@ function openModal(i) {
     if (imgLink != '') {
         modal.style.display = "block";
 
-        modalImage.style['background-image'] = "url(" + imgLink + ")";
+        modalImage.style['background-image'] = "url(https://drive.google.com/uc?export=view&id=" + imgLink + ")";
         modalImage.style['background-position-x'] = document.getElementById("host" + i + "-photo-x").value;
         modalImage.style['background-position-y'] = document.getElementById("host" + i + "-photo-y").value;
         modalImage.style['background-size'] = document.getElementById("host" + i + "-photo-zoom").value;

@@ -30,13 +30,13 @@ def school():
 def preview():
     if request.method == "POST":
         data = process_data(request.form, request.files)
-        print(data)
+        # print(data)
         return render_template("school_event.html", event=data, school=data['name'])
     else:
         return redirect('/')
 
 def process_data(form, files):
-    print(form)
+    # print(form)
     # print(files)
     
     data = {}
@@ -91,7 +91,7 @@ def process_data(form, files):
         data['hosts'].append({
             'name' : form['host' + str(i) + '_name'],
             'bio' : form['host' + str(i) + '_bio'],
-            'photo': form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
+            'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
             'photo_x': form['host' + str(i) + '_photo_x'],
             'photo_y': form['host' + str(i) + '_photo_y'],
             'photo_zoom': form['host' + str(i) + '_photo_zoom'],
@@ -108,7 +108,7 @@ def process_data(form, files):
         })
         i += 1
 
-    print(data)
+    # print(data)
     return data
 
 
