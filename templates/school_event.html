@@ -1,5 +1,12 @@
 {% extends 'base.html' %}
 
+{% block navbar %}
+<div style="float:right;">
+    <li><a onclick="history.back()" class='action-button'>Edit</a></li>
+    <li><a class='action-button'>Submit</a></li>
+</div>
+{% endblock %}
+
 {% block head %}
 <title>{{ school }} | Tree-Plenish Events</title>
 {% endblock %}
