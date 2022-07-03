@@ -6,6 +6,19 @@ var tree_fields = document.getElementById('tree-fields');
 var add_tree_fields = document.getElementById('add-tree-fields');
 var remove_tree_fields = document.getElementById('remove-tree-fields');
 
+
+//  modal
+var modal = document.getElementById("crop-popup");
+var errorModal = document.getElementById("error-popup");
+var modalImage = document.getElementById("crop-image");
+
+document.getElementById("host1-crop-button").onclick = function() { openModal(1); };
+
+var span = document.getElementsByClassName("close")[0];
+var spanError = document.getElementsByClassName("close")[1];
+
+var activeImgIdx;
+
 add_host_fields.onclick = function(){
     console.log("add host");
     var host_num = host_fields.getElementsByClassName('host-field').length + 1;
@@ -16,21 +29,38 @@ add_host_fields.onclick = function(){
     title.innerHTML = 'Host ' + host_num;
 
     field_group.appendChild(title);
-    field_group.appendChild(host_field('Name', 'text', 'host' + host_num + '_name', true));
-    field_group.appendChild(host_field('Bio', 'text', 'host' + host_num + '_bio', true));
-    field_group.appendChild(host_field('Photo', 'file', 'host' + host_num + '_photo', false));
+    field_group.appendChild(host_field('Name', 'text', 'host' + host_num + '_name', true, null));
+    field_group.appendChild(host_field('Bio', 'text', 'host' + host_num + '_bio', true, null));
+    field_group.appendChild(host_field('Photo', 'text', 'host' + host_num + '_photo', false, null));
+
+    var img_options_group = document.createElement('div');
+    img_options_group.setAttribute('class', 'inline-input-group');
+    img_options_group.appendChild(host_field('x-offset', 'text', 'host' + host_num + '_photo_x', false, '0px'));
+    img_options_group.appendChild(host_field('y-offset', 'text', 'host' + host_num + '_photo_y', false, '0px'));
+    img_options_group.appendChild(host_field('zoom', 'text', 'host' + host_num + '_photo_zoom', false, '100%'));
+    var btn = document.createElement('button');
+    btn.setAttribute('id', "host" + host_num +  "-crop-button");
+    btn.setAttribute('class', "crop-button");
+    btn.setAttribute('type', "button");
+    btn.innerHTML = 'Adjust photo position and zoom';
+    btn.onclick = function() { openModal(host_num); };
+    img_options_group.appendChild(btn);    
+
+    field_group.appendChild(img_options_group);
 
     host_fields.appendChild(field_group);
 }
 
-function host_field(label_text, type, name, required) {
+function host_field(label_text, type, name, required, default_val) {
     var field = document.createElement('div');
     field.setAttribute('class', 'form-group');
     var label = document.createElement('label');
     label.innerHTML = label_text;
     var input = document.createElement('input');
     if (required) input.setAttribute('required', '');
+    if (default_val != null) input.setAttribute('value', default_val);
     input.setAttribute('type',type);
+    input.setAttribute('id',name.replaceAll('_', '-'));
     input.setAttribute('name',name);
     input.setAttribute('class','form-control');
     field.appendChild(label);
@@ -88,5 +118,106 @@ function selectMediaType(selected) {
     } else {
         document.getElementById("video-group").style.setProperty("display", "block");
         document.getElementById("text-group").style.setProperty("display", "none");
+    }
+}
+
+function openModal(i) {
+    console.log("click");
+    imgLink = document.getElementById("host" + i + "-photo").value;
+    activeImgIdx = i;
+    if (imgLink != '') {
+        modal.style.display = "block";
+
+        modalImage.style['background-image'] = "url(" + imgLink + ")";
+        modalImage.style['background-position-x'] = document.getElementById("host" + i + "-photo-x").value;
+        modalImage.style['background-position-y'] = document.getElementById("host" + i + "-photo-y").value;
+        modalImage.style['background-size'] = document.getElementById("host" + i + "-photo-zoom").value;
+    } else {
+        errorModal.style.display = "block";
+    }
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+    modal.style.display = "none";
+    document.getElementById("host" + activeImgIdx + "-photo-x").value = modalImage.style['background-position-x'];
+    document.getElementById("host" + activeImgIdx + "-photo-y").value = modalImage.style['background-position-y'];
+    document.getElementById("host" + activeImgIdx + "-photo-zoom").value = modalImage.style['background-size'];
+}
+
+spanError.onclick = function() {
+    errorModal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    } else if (event.target == errorModal) {
+        errorModal.style.display = "none";
+    }
+}
+
+var slider = document.getElementById('zoom-slider');
+slider.onclick = function() {
+    modalImage.style['background-size'] = slider.value + '%';
+}
+
+dragElementBackground(modalImage);
+
+function dragElementBackground(element) {
+    
+    var startX = 0, startY = 0, endX = 0, endY = 0;
+    element.onmousedown = dragStart;
+    element.ontouchstart = dragStart;
+
+    function dragStart(e) {
+        e = e || window.event;
+        e.preventDefault();
+        // mouse cursor position at start  
+        if (e.clientX) {  // mousemove
+            startX = e.clientX;
+            startY = e.clientY;
+        } else { // touchmove - assuming a single touchpoint
+            startX = e.touches[0].clientX
+            startY = e.touches[0].clientY
+        }
+        document.onmouseup = dragStop;
+        document.ontouchend = dragStop;
+        document.onmousemove = elementDrag;  // call whenever the cursor moves
+        document.ontouchmove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        if (element.style['background-position'] == '') {
+            element.style['background-position-x'] = '0px';
+            element.style['background-position-y'] = '0px';
+        }
+        e = e || window.event;
+        e.preventDefault();
+        // calculate new cursor position
+        if (e.clientX) {
+            endX = startX - e.clientX;
+            endY = startY - e.clientY;
+            startX = e.clientX;
+            startY = e.clientY;
+        } else {
+            endX = startX - e.touches[0].clientX;
+            endY = startY - e.touches[0].clientY;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }
+        // set the new position
+        // console.log(element.style['background-position-x'], endX, parseInt(element.style['background-position-y'].replace('px', '')), endY);
+        element.style['background-position-x'] = (parseInt(element.style['background-position-x'].replace('px', '')) - endX) + "px";
+        element.style['background-position-y'] = (parseInt(element.style['background-position-y'].replace('px', '')) - endY) + "px";
+    }
+
+    function dragStop() {
+        // stop moving on touch end / mouse btn is released 
+        document.onmouseup = null;
+        document.onmousemove = null;
+        document.ontouchend = null;
+        document.ontouchmove = null;
     }
 }

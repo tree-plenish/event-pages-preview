@@ -179,6 +179,8 @@ hr{
     margin: auto;
     background-size: cover;
     background-position: center top;
+    background-repeat: no-repeat;
+    transform-origin: center center;
 }
 .landscape{
     height: 100%;

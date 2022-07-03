@@ -80,10 +80,50 @@
               </div>
               <div class="form-group">
                 <label>Photo</label>
-                <input type="file" class="form-control" name="host1_photo" placeholder="">
+                <!-- <input type="file" class="form-control" name="host1_photo" placeholder=""> -->
+                <input id="host1-photo" type="text" class="form-control" name="host1_photo" placeholder="Enter photo link">
+                <div class="inline-input-group">
+                  <div class="form-group">
+                    <label>x-offset</label>
+                    <input id="host1-photo-x" type="text" class="form-control" name="host1_photo_x" value="0px" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>y-offset</label>
+                    <input id="host1-photo-y" type="text" class="form-control" name="host1_photo_y" value="0px" readonly>
+                  </div>
+                  <div class="form-group">
+                    <label>zoom</label>
+                    <input id="host1-photo-zoom" type="text" class="form-control" name="host1_photo_zoom" value="100%" readonly>
+                  </div>
+                  <button type="button" id="host1-crop-button" class="crop-button">Adjust photo position and zoom</button>
+                </div>
               </div>
             </div>
           </div>
+
+          <div id="crop-popup" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <div class="circleCropper" id="crop-image">
+              </div>
+              <p>Drag the image to shift its position, and use the slider below to zoom in/out.</p>
+              <input type="range" min="50" max="300" value="100" class="slider" id="zoom-slider">
+            </div>
+          
+          </div>
+
+          <div id="error-popup" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <p>Please enter a Google Drive link in the photo field.</p>
+            </div>
+          
+          </div>
+
           <button type="button" id="add-host-fields">Add Host</button>
           <button type="button" id="remove-host-fields">Remove Host</button>
           <!-- <p><img id="output" width="200" /></p> -->

@@ -30,6 +30,7 @@ def school():
 def preview():
     if request.method == "POST":
         data = process_data(request.form, request.files)
+        print(data)
         return render_template("school_event.html", event=data, school=data['name'])
     else:
         return redirect('/')
@@ -69,6 +70,7 @@ def process_data(form, files):
     data['hosts'] = []
     i = 1
     while 'host' + str(i) + '_name' in form:
+        # 1) save photo file
         # f = request.files['host' + str(i) + '_photo']
         # filename = secure_filename(f.filename)
         # if filename != '':
@@ -76,11 +78,23 @@ def process_data(form, files):
         #     if file_ext not in application.config['UPLOAD_EXTENSIONS']:
         #         abort(400)
         #     f.save(os.path.join(application.config['UPLOAD_PATH'], filename))
+
+        # 2) use decoded image data directly
+        # data['hosts'].append({
+        #     'name' : form['host' + str(i) + '_name'],
+        #     'bio' : form['host' + str(i) + '_bio'],
+        #     'photo': 'data:image/jpeg;base64,' + base64.b64encode(files['host' + str(i) + '_photo'].read()).decode() if files['host' + str(i) + '_photo'].filename != '' else 'static/images/default_profile.png'
+        #     # 'photo' : 'static/uploads/' + filename if filename != '' else 'static/images/default_profile.png'
+        # })
+
+        # 3) google drive link
         data['hosts'].append({
             'name' : form['host' + str(i) + '_name'],
             'bio' : form['host' + str(i) + '_bio'],
-            'photo': 'data:image/jpeg;base64,' + base64.b64encode(files['host' + str(i) + '_photo'].read()).decode() if files['host' + str(i) + '_photo'].filename != '' else 'static/images/default_profile.png'
-            # 'photo' : 'static/uploads/' + filename if filename != '' else 'static/images/default_profile.png'
+            'photo': form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
+            'photo_x': form['host' + str(i) + '_photo_x'],
+            'photo_y': form['host' + str(i) + '_photo_y'],
+            'photo_zoom': form['host' + str(i) + '_photo_zoom'],
         })
         i += 1
 
@@ -94,7 +108,7 @@ def process_data(form, files):
         })
         i += 1
 
-    # print(data)
+    print(data)
     return data
 
 

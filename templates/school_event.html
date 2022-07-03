@@ -154,7 +154,7 @@
         <div class="cards">
             {% for person in event.hosts %}
                 <div class="card {{'min3' if event.host_names|length >= 3}} {{'min2' if event.host_names|length >= 2}}">
-                    <div class="circleCropper" style="background-image: url({{ person.photo }})">
+                    <div class="circleCropper" style="background-image: url({{ person.photo }}); background-size: {{ person.photo_zoom }}; background-position: {{ person.photo_x }} {{ person.photo_y }};">
                     </div>
                     <div class="container">
                         <h2>{{ person.name }}</h2>
