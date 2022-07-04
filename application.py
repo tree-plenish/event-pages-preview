@@ -1,11 +1,29 @@
 from flask import Flask, render_template, request, redirect, abort
 from data import eventData
-from werkzeug.utils import secure_filename
-import os
-import base64
+# from werkzeug.utils import secure_filename
+# import os
+# import base64
 
 import datetime
 from dateutil.relativedelta import relativedelta
+from pathlib import Path
+import sys
+import importlib
+
+# Add parent directory to PYTHONPATH to be able to find package.
+file = Path(__file__).resolve()
+parent, top = file.parent, file.parents[1] # 2
+
+sys.path.append(str(top))
+try:
+    sys.path.remove(str(parent))
+except ValueError:
+    pass
+
+__package__ = '.'.join(parent.parts[len(top.parts):])
+importlib.import_module(__package__)
+
+from tech_team_database.dependencies.DatabaseSQLOperations import TpSQL
 
 application = Flask(__name__)
 
@@ -14,17 +32,24 @@ application.config['MAX_CONTENT_PATH'] = 1024*1024*1024
 application.config['UPLOAD_PATH'] = 'static/uploads'
 application.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 
+tpSQL = TpSQL()
 
 #home page
 @application.route('/index')
 @application.route('/')
 def index():
-    return render_template("form.html")
+    return render_template("login.html", error=False)
 
 #school-specific page router
-@application.route('/school')
-def school():
-    return render_template('school_event.html', event=eventData, school=eventData['name'])
+@application.route("/form", methods=["GET", "POST"])
+def form():
+    if request.method == "POST":
+        school = login(int(request.form['schoolid']), int(request.form['password']))
+        if school != None:
+            return render_template('form.html', school=school)
+        else:
+            return render_template('login.html', error=True)
+    return redirect('/')
 
 @application.route("/preview", methods=["GET", "POST"])
 def preview():
@@ -32,8 +57,16 @@ def preview():
         data = process_data(request.form, request.files)
         # print(data)
         return render_template("school_event.html", event=data, school=data['name'])
+    return redirect('/')
+
+def login(schoolid, password):
+    table = tpSQL.getTable('event')
+    if len(table.loc[table['id'] == schoolid]['pwd'].values) == 0:
+        return None
+    if password == table.loc[table['id'] == schoolid]['pwd'].values[0]:
+        return table.loc[table['id'] == schoolid]['name'][0]
     else:
-        return redirect('/')
+        return None
 
 def process_data(form, files):
     # print(form)

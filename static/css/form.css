@@ -131,3 +131,8 @@ button:hover{
     background: #016d30;
     cursor: pointer;
 }
+
+.error {
+    display: block;
+    color: red;
+}
