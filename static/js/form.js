@@ -11,11 +11,13 @@ var remove_tree_fields = document.getElementById('remove-tree-fields');
 var modal = document.getElementById("crop-popup");
 var errorModal = document.getElementById("error-popup");
 var modalImage = document.getElementById("crop-image");
+var imageTester = document.getElementById("image-tester");
+var modalImageError = document.getElementById("modal-image-error");
 
 document.getElementById("host1-crop-button").onclick = function() { openModal(1); };
 
-var span = document.getElementsByClassName("close")[0];
-var spanError = document.getElementsByClassName("close")[1];
+var confirmImage = document.getElementById("confirm-image");
+var spanError = document.getElementsByClassName("close")[0];
 
 var activeImgIdx;
 
@@ -32,6 +34,7 @@ add_host_fields.onclick = function(){
     field_group.appendChild(host_field('Name', 'text', 'host' + host_num + '_name', true, null));
     field_group.appendChild(host_field('Bio', 'text', 'host' + host_num + '_bio', true, null));
     field_group.appendChild(host_field('Photo', 'text', 'host' + host_num + '_photo', false, null));
+    field_group.lastChild.lastChild.setAttribute('onchange', 'openModalCheck(this);');
 
     var img_options_group = document.createElement('div');
     img_options_group.setAttribute('class', 'inline-input-group');
@@ -123,12 +126,13 @@ function selectMediaType(selected) {
 
 function openModal(i) {
     console.log("click");
-    imgLink = document.getElementById("host" + i + "-photo").value;
+    imgId = document.getElementById("host" + i + "-photo").value;
     activeImgIdx = i;
-    if (imgLink != '') {
+    if (imgId != '') {
+        imageTester.src = "https://drive.google.com/uc?export=view&id=" + imgId;
         modal.style.display = "block";
 
-        modalImage.style['background-image'] = "url(https://drive.google.com/uc?export=view&id=" + imgLink + ")";
+        modalImage.style['background-image'] = "url(https://drive.google.com/uc?export=view&id=" + imgId + ")";
         modalImage.style['background-position-x'] = document.getElementById("host" + i + "-photo-x").value;
         modalImage.style['background-position-y'] = document.getElementById("host" + i + "-photo-y").value;
         modalImage.style['background-size'] = document.getElementById("host" + i + "-photo-zoom").value;
@@ -137,9 +141,9 @@ function openModal(i) {
     }
 }
 
-// When the user clicks on <span> (x), close the modal
-span.onclick = function() {
+confirmImage.onclick = function() {
     modal.style.display = "none";
+    modalImageError.style.display = 'none';
     document.getElementById("host" + activeImgIdx + "-photo-x").value = modalImage.style['background-position-x'];
     document.getElementById("host" + activeImgIdx + "-photo-y").value = modalImage.style['background-position-y'];
     document.getElementById("host" + activeImgIdx + "-photo-zoom").value = modalImage.style['background-size'];
@@ -152,6 +156,7 @@ spanError.onclick = function() {
 // When the user clicks anywhere outside of the modal, close it
 window.onclick = function(event) {
     if (event.target == modal) {
+        modalImageError.style.display = 'none';
         modal.style.display = "none";
     } else if (event.target == errorModal) {
         errorModal.style.display = "none";
@@ -220,4 +225,13 @@ function dragElementBackground(element) {
         document.ontouchend = null;
         document.ontouchmove = null;
     }
+}
+
+function imageError() {
+    console.log("image error");
+    modalImageError.style['display'] = 'block';
+}
+
+function openModalCheck(field) { 
+    if (field.value != "") openModal(field.id.replace(/\D/g,'')); 
 }

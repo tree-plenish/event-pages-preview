@@ -81,7 +81,7 @@
               <div class="form-group">
                 <label>Photo</label>
                 <!-- <input type="file" class="form-control" name="host1_photo" placeholder=""> -->
-                <input id="host1-photo" type="text" class="form-control" name="host1_photo" placeholder="Enter Google Drive file ID">
+                <input id="host1-photo" type="text" class="form-control" name="host1_photo" placeholder="Enter Google Drive file ID" onchange="openModalCheck(this)">
                 <div class="inline-input-group">
                   <div class="form-group">
                     <label>x-offset</label>
@@ -105,11 +105,13 @@
 
             <!-- Modal content -->
             <div class="modal-content">
-              <span class="close">&times;</span>
               <div class="circleCropper" id="crop-image">
               </div>
+              <img id="image-tester" class="image-tester" onerror="imageError()">
+              <p id="modal-image-error">Error: Image could not be loaded. Please make sure a valid Google Drive file ID (not link) is entered, and the image is shared to everyone with link.</p>
               <p>Drag the image to shift its position, and use the slider below to zoom in/out.</p>
               <input type="range" min="50" max="300" value="100" class="slider" id="zoom-slider">
+              <button type="button" id="confirm-image" class="crop-button">Done</button>
             </div>
           
           </div>

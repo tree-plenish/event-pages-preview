@@ -136,3 +136,12 @@ button:hover{
     display: block;
     color: red;
 }
+
+.image-tester {
+    display: none;
+}
+
+#modal-image-error {
+    display: none;
+    color: red;
+}
