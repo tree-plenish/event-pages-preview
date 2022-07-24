@@ -21,7 +21,36 @@ var spanError = document.getElementsByClassName("close")[0];
 
 var activeImgIdx;
 
+
+window.addEventListener('load', function() {
+    var host_num = 1;
+    for (const host of data.hosts) {
+        if (!document.getElementById('host' + host_num + '-name')) {
+            add_host_field();
+        }
+        document.getElementById('host' + host_num + '-name').value = host.name;
+        document.getElementById('host' + host_num + '-bio').value = host.bio;
+        document.getElementById('host' + host_num + '-photo').value = host.photo;
+        document.getElementById('host' + host_num + '-photo-x').value = host.photo_x + 'px';
+        document.getElementById('host' + host_num + '-photo-y').value = host.photo_y + 'px';
+        document.getElementById('host' + host_num + '-photo-zoom').value = host.photo_zoom + '%';
+        host_num++;
+    }
+    var tree_num = 1;
+    for (const tree of data.trees) {
+        if (!document.getElementById('tree' + tree_num + '-species')) {
+            add_tree_field();
+        }
+        document.getElementById('tree' + tree_num + '-species').value = tree.name;
+        tree_num++;
+    }
+})
+
 add_host_fields.onclick = function(){
+    add_host_field();
+}
+
+function add_host_field() {
     console.log("add host");
     var host_num = host_fields.getElementsByClassName('host-field').length + 1;
     var field_group = document.createElement('div');
@@ -72,6 +101,10 @@ function host_field(label_text, type, name, required, default_val) {
 }
 
 add_tree_fields.onclick = function(){
+    add_tree_fields();
+}
+
+function add_tree_field() {
     console.log("add tree");
     var tree_num = tree_fields.getElementsByClassName('form-group').length + 1;
     var field_group = document.createElement('div');
@@ -82,6 +115,7 @@ add_tree_fields.onclick = function(){
     var input = document.createElement('input')
     input.setAttribute('type','text');
     input.setAttribute('name','tree' + tree_num + '_species');
+    input.setAttribute('id','tree' + tree_num + '-species');
     input.setAttribute('class','form-control');
     input.setAttribute('required', '');
 

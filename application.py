@@ -9,6 +9,9 @@ from dateutil.relativedelta import relativedelta
 from pathlib import Path
 import sys
 import importlib
+import pandas as pd
+
+from trees import tree_photos
 
 # Add parent directory to PYTHONPATH to be able to find package.
 file = Path(__file__).resolve()
@@ -60,6 +63,7 @@ def preview():
     if request.method == "POST":
         global data
         data = process_data(request.form, request.files)
+        print(data)
         return render_template("school_event.html", event=data, school=data['name'])
     return redirect('/')
 
@@ -82,8 +86,21 @@ def login(schoolid, password):
     data['date'] = str(data['date']).split()[0]
     data['id'] = schoolid
     data['hosts'] = []
-    # host_table = tpSQL.getTable('host')
-    # data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
+    host_table = tpSQL.getTable('host')
+    tree_table = tpSQL.getTable('tree')
+    data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
+    data['trees'] = []
+    for host in data['hosts']:
+        if type(host['photo_x']) == pd._libs.missing.NAType:
+            host['photo_x'] = 0
+        if type(host['photo_y']) == pd._libs.missing.NAType:
+            host['photo_y'] = 0
+        if type(host['photo_zoom']) == pd._libs.missing.NAType:
+            host['photo_zoom'] = 100
+    for index, row in tree_table.iterrows():
+        if row['event_id'] == schoolid:
+            tree_info = {'name' : row['species'], 'image_link' : tree_photos[row['species']]}
+            data['trees'].append(tree_info)
 
     if len(table.loc[table['id'] == schoolid]['pwd'].values) == 0:
         return None
@@ -123,7 +140,7 @@ def process_data(form, files):
     else:
         data['is_pickup_only'] = False
 
-    # data['hosts'] = []
+    data['hosts'] = []
     i = 1
     while 'host' + str(i) + '_name' in form:
         # 1) save photo file
@@ -164,16 +181,6 @@ def process_data(form, files):
                 'photo_y': form['host' + str(i) + '_photo_y'],
                 'photo_zoom': form['host' + str(i) + '_photo_zoom'],
             })
-        i += 1
-
-    data['trees'] = []
-    i = 1
-    while 'tree' + str(i) + '_species' in form:
-        data['trees'].append({
-            'name' : form['tree' + str(i) + '_species'],
-            'image_link' : 'static/images/default_tree.png',
-            'description_link': ''
-        })
         i += 1
 
     # print(data)
