@@ -27,44 +27,68 @@ from tech_team_database.dependencies.DatabaseSQLOperations import TpSQL
 
 application = Flask(__name__)
 
-application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-application.config['MAX_CONTENT_PATH'] = 1024*1024*1024
-application.config['UPLOAD_PATH'] = 'static/uploads'
-application.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
+# application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+# application.config['MAX_CONTENT_PATH'] = 1024*1024*1024
+# application.config['UPLOAD_PATH'] = 'static/uploads'
+# application.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
 
-tpSQL = TpSQL()
+tpSQL = TpSQL(schema='tp2022')
+data = {}
 
-#home page
+# login page
 @application.route('/index')
 @application.route('/')
 def index():
     return render_template("login.html", error=False)
 
-#school-specific page router
+# event info form
 @application.route("/form", methods=["GET", "POST"])
 def form():
     if request.method == "POST":
         school = login(int(request.form['schoolid']), int(request.form['password']))
         if school != None:
-            return render_template('form.html', school=school)
+            print(data)
+
+            return render_template('form.html', data=data)
         else:
             return render_template('login.html', error=True)
     return redirect('/')
 
+# preview page
 @application.route("/preview", methods=["GET", "POST"])
 def preview():
     if request.method == "POST":
+        global data
         data = process_data(request.form, request.files)
-        # print(data)
         return render_template("school_event.html", event=data, school=data['name'])
     return redirect('/')
 
+# submitted page
+@application.route("/submit", methods=["GET", "POST"])
+def submit():
+    if request.method == "POST":
+        submit_to_database(data)
+        return render_template("submit.html")
+    return redirect('/')
+
+
+# helper functions below:
+
 def login(schoolid, password):
     table = tpSQL.getTable('event')
+
+    global data
+    data = table.set_index('id').T.to_dict()[schoolid]
+    data['date'] = str(data['date']).split()[0]
+    data['id'] = schoolid
+    data['hosts'] = []
+    # host_table = tpSQL.getTable('host')
+    # data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
+
     if len(table.loc[table['id'] == schoolid]['pwd'].values) == 0:
         return None
     if password == table.loc[table['id'] == schoolid]['pwd'].values[0]:
-        return table.loc[table['id'] == schoolid]['name'][0]
+        return table.loc[table['id'] == schoolid]['name'].values[0]
     else:
         return None
 
@@ -72,7 +96,6 @@ def process_data(form, files):
     # print(form)
     # print(files)
     
-    data = {}
     data['name'] = form['name']
     data['state'] = form['state']
 
@@ -95,12 +118,12 @@ def process_data(form, files):
 
     data['display_email'] = form['display_email']
 
-    if form['pickup_only'] == 'True':
-        data['pickup_only'] = True
+    if form['is_pickup_only'] == 'True':
+        data['is_pickup_only'] = True
     else:
-        data['pickup_only'] = False
+        data['is_pickup_only'] = False
 
-    data['hosts'] = []
+    # data['hosts'] = []
     i = 1
     while 'host' + str(i) + '_name' in form:
         # 1) save photo file
@@ -121,14 +144,26 @@ def process_data(form, files):
         # })
 
         # 3) google drive link
-        data['hosts'].append({
-            'name' : form['host' + str(i) + '_name'],
-            'bio' : form['host' + str(i) + '_bio'],
-            'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
-            'photo_x': form['host' + str(i) + '_photo_x'],
-            'photo_y': form['host' + str(i) + '_photo_y'],
-            'photo_zoom': form['host' + str(i) + '_photo_zoom'],
-        })
+        host_exists = False
+        for host in data['hosts']:
+            if host['name'] == form['host' + str(i) + '_name']:
+                host_exists = True
+                host['new'] = False
+                host['bio'] = form['host' + str(i) + '_bio']
+                host['photo'] = 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
+                host['photo_x'] = form['host' + str(i) + '_photo_x']
+                host['photo_y'] = form['host' + str(i) + '_photo_y']
+                host['photo_zoom'] = form['host' + str(i) + '_photo_zoom']
+        if not host_exists:
+            data['hosts'].append({
+                'new' : True,
+                'name' : form['host' + str(i) + '_name'],
+                'bio' : form['host' + str(i) + '_bio'],
+                'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
+                'photo_x': form['host' + str(i) + '_photo_x'],
+                'photo_y': form['host' + str(i) + '_photo_y'],
+                'photo_zoom': form['host' + str(i) + '_photo_zoom'],
+            })
         i += 1
 
     data['trees'] = []
@@ -144,6 +179,37 @@ def process_data(form, files):
     # print(data)
     return data
 
+def submit_to_database(data):
+    print(data)
+    # todo: use a row update instead? 
+    tpSQL.batchUpdate('event', 'id', 'name', [data['id']], [data['name']])
+    tpSQL.batchUpdate('event', 'id', 'state', [data['id']], [data['state']])
+    # tpSQL.batchUpdate('school', 'id', 'date', [data['id']], [data['date']])
+
+    tpSQL.batchUpdate('event', 'id', 'tree_goal', [data['id']], [data['tree_goal']])
+    # why no more media_type?
+    # tpSQL.batchUpdate('school', 'schoolid', 'date', [data['id']], [data['media_type']])
+    tpSQL.batchUpdate('event', 'id', 'bio', [data['id']], [data['text']])
+    tpSQL.batchUpdate('event', 'id', 'video', [data['id']], [data['video']])
+    tpSQL.batchUpdate('event', 'id', 'display_email', [data['id']], [data['display_email']])
+    tpSQL.batchUpdate('event', 'id', 'is_pickup_only', [data['id']], [data['is_pickup_only']])
+
+    # # hosts
+    # for host in data['hosts']:
+    #     if 'new' in host:
+    #         if host['new'] == True:
+    #             # get next uuid
+    #             uuid = tpSQL.getColData('host', ['uuid']).max().values[0] + 1
+    #             tpSQL.batchInsert('host', [[uuid, data['id'], host['name']]], cols=['uuid', 'event_id', 'name']) # need to add bio and photo, etc. 
+    #         else:
+    #             pass
+    #             # tpSQL.batchUpdate('host', 'name') # better to check both name and event id, but need functionality from tpsql
+    #     else: # host was in db before, but was deleted from form. Delete from db?
+    #         pass
+
+    # trees
+
+    print(tpSQL.getTable('event'))
 
 if __name__ == "__main__":
     application.run()

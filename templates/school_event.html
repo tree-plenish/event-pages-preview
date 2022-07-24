@@ -2,8 +2,10 @@
 
 {% block navbar %}
 <div style="float:right;">
-    <li><a onclick="history.back()" class='action-button'>Edit</a></li>
-    <li><a class='action-button'>Submit</a></li>
+    <form action="{{ url_for('submit') }}" method="POST" enctype="multipart/form-data">
+        <li class='action-button-wrapper'><button type="button" onclick="history.back()" class='action-button'>Edit</button></li>
+        <li class='action-button-wrapper'><button type="submit" class='action-button'>Submit</button></li>
+    </form>
 </div>
 {% endblock %}
 
