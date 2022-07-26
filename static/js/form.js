@@ -3,8 +3,6 @@ var add_host_fields = document.getElementById('add-host-fields');
 var remove_host_fields = document.getElementById('remove-host-fields');
 
 var tree_fields = document.getElementById('tree-fields');
-var add_tree_fields = document.getElementById('add-tree-fields');
-var remove_tree_fields = document.getElementById('remove-tree-fields');
 
 
 //  modal
@@ -60,16 +58,16 @@ function add_host_field() {
     title.innerHTML = 'Host ' + host_num;
 
     field_group.appendChild(title);
-    field_group.appendChild(host_field('Name', 'text', 'host' + host_num + '_name', true, null));
-    field_group.appendChild(host_field('Bio', 'text', 'host' + host_num + '_bio', true, null));
-    field_group.appendChild(host_field('Photo', 'text', 'host' + host_num + '_photo', false, null));
+    field_group.appendChild(host_field('Name', 'text', 'host' + host_num + '_name', true, null, false));
+    field_group.appendChild(host_field('Bio', 'text', 'host' + host_num + '_bio', true, null, false));
+    field_group.appendChild(host_field('Photo', 'text', 'host' + host_num + '_photo', false, null, false));
     field_group.lastChild.lastChild.setAttribute('onchange', 'openModalCheck(this);');
 
     var img_options_group = document.createElement('div');
     img_options_group.setAttribute('class', 'inline-input-group');
-    img_options_group.appendChild(host_field('x-offset', 'text', 'host' + host_num + '_photo_x', false, '0px'));
-    img_options_group.appendChild(host_field('y-offset', 'text', 'host' + host_num + '_photo_y', false, '0px'));
-    img_options_group.appendChild(host_field('zoom', 'text', 'host' + host_num + '_photo_zoom', false, '100%'));
+    img_options_group.appendChild(host_field('x-offset', 'text', 'host' + host_num + '_photo_x', false, '0px', true));
+    img_options_group.appendChild(host_field('y-offset', 'text', 'host' + host_num + '_photo_y', false, '0px', true));
+    img_options_group.appendChild(host_field('zoom', 'text', 'host' + host_num + '_photo_zoom', false, '100%', true));
     var btn = document.createElement('button');
     btn.setAttribute('id', "host" + host_num +  "-crop-button");
     btn.setAttribute('class', "crop-button");
@@ -83,7 +81,7 @@ function add_host_field() {
     host_fields.appendChild(field_group);
 }
 
-function host_field(label_text, type, name, required, default_val) {
+function host_field(label_text, type, name, required, default_val, hidden) {
     var field = document.createElement('div');
     field.setAttribute('class', 'form-group');
     var label = document.createElement('label');
@@ -95,13 +93,10 @@ function host_field(label_text, type, name, required, default_val) {
     input.setAttribute('id',name.replaceAll('_', '-'));
     input.setAttribute('name',name);
     input.setAttribute('class','form-control');
+    if (hidden) field.setAttribute('style', 'display:none');
     field.appendChild(label);
     field.appendChild(input);
     return field;
-}
-
-add_tree_fields.onclick = function(){
-    add_tree_fields();
 }
 
 function add_tree_field() {
@@ -118,6 +113,7 @@ function add_tree_field() {
     input.setAttribute('id','tree' + tree_num + '-species');
     input.setAttribute('class','form-control');
     input.setAttribute('required', '');
+    input.setAttribute('readonly', '');
 
     field_group.appendChild(label);
     field_group.appendChild(input);
@@ -137,14 +133,6 @@ remove_host_fields.onclick = function(){
     var fields = host_fields.getElementsByClassName('host-field');
     if(fields.length >= 2) {
         host_fields.removeChild(fields[(fields.length) - 1]);
-    }
-}
-
-remove_tree_fields.onclick = function(){
-    console.log("remove tree");
-    var fields = tree_fields.getElementsByClassName('form-group');
-    if(fields.length >= 2) {
-        tree_fields.removeChild(fields[(fields.length) - 1]);
     }
 }
 

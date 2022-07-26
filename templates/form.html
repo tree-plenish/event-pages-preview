@@ -83,15 +83,15 @@
                 <!-- <input type="file" class="form-control" name="host1_photo" placeholder=""> -->
                 <input id="host1-photo" type="text" class="form-control" name="host1_photo" placeholder="Enter Google Drive file ID" onchange="openModalCheck(this)">
                 <div class="inline-input-group">
-                  <div class="form-group">
+                  <div  style="display:none" class="form-group">
                     <label>x-offset</label>
                     <input id="host1-photo-x" type="text" class="form-control" name="host1_photo_x" value="0px" readonly>
                   </div>
-                  <div class="form-group">
+                  <div  style="display:none" class="form-group">
                     <label>y-offset</label>
                     <input id="host1-photo-y" type="text" class="form-control" name="host1_photo_y" value="0px" readonly>
                   </div>
-                  <div class="form-group">
+                  <div  style="display:none" class="form-group">
                     <label>zoom</label>
                     <input id="host1-photo-zoom" type="text" class="form-control" name="host1_photo_zoom" value="100%" readonly>
                   </div>
@@ -133,11 +133,9 @@
           <div id="tree-fields">
             <div class="form-group">
               <label>Tree 1 Species</label>
-              <input id="tree1-species" type="text" class="form-control" name="tree1_species" placeholder="" required>
+              <input id="tree1-species" type="text" class="form-control" name="tree1_species" placeholder="" required readonly>
             </div>
           </div>
-          <button type="button" id="add-tree-fields">Add Tree</button>
-          <button type="button" id="remove-tree-fields">Remove Tree</button>
 
           <br>
           <button type="submit">Preview Event Page</button>

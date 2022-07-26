@@ -3,7 +3,7 @@
 {% block navbar %}
 <div style="float:right;">
     <form action="{{ url_for('submit') }}" method="POST" enctype="multipart/form-data">
-        <li class='action-button-wrapper'><button type="button" onclick="history.back()" class='action-button'>Edit</button></li>
+        <li class='action-button-wrapper'><button type="button" onclick="{{ url_for('form') }}" class='action-button'>Edit</button></li>
         <li class='action-button-wrapper'><button type="submit" class='action-button'>Submit</button></li>
     </form>
 </div>
