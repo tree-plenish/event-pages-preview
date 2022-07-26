@@ -3,8 +3,6 @@ var add_host_fields = document.getElementById('add-host-fields');
 var remove_host_fields = document.getElementById('remove-host-fields');
 
 var tree_fields = document.getElementById('tree-fields');
-var add_tree_fields = document.getElementById('add-tree-fields');
-var remove_tree_fields = document.getElementById('remove-tree-fields');
 
 
 //  modal
@@ -100,10 +98,6 @@ function host_field(label_text, type, name, required, default_val) {
     return field;
 }
 
-add_tree_fields.onclick = function(){
-    add_tree_fields();
-}
-
 function add_tree_field() {
     console.log("add tree");
     var tree_num = tree_fields.getElementsByClassName('form-group').length + 1;
@@ -118,6 +112,7 @@ function add_tree_field() {
     input.setAttribute('id','tree' + tree_num + '-species');
     input.setAttribute('class','form-control');
     input.setAttribute('required', '');
+    input.setAttribute('readonly', '');
 
     field_group.appendChild(label);
     field_group.appendChild(input);
@@ -137,14 +132,6 @@ remove_host_fields.onclick = function(){
     var fields = host_fields.getElementsByClassName('host-field');
     if(fields.length >= 2) {
         host_fields.removeChild(fields[(fields.length) - 1]);
-    }
-}
-
-remove_tree_fields.onclick = function(){
-    console.log("remove tree");
-    var fields = tree_fields.getElementsByClassName('form-group');
-    if(fields.length >= 2) {
-        tree_fields.removeChild(fields[(fields.length) - 1]);
     }
 }
 
