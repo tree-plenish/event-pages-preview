@@ -48,11 +48,14 @@ def index():
 @application.route("/form", methods=["GET", "POST"])
 def form():
     if request.method == "POST":
-        school = login(int(request.form['schoolid']), int(request.form['password']))
-        if school != None:
+        result = login(int(request.form['schoolid']), int(request.form['password']))
+        if result == "ready":
             print(data)
-
             return render_template('form.html', data=data)
+        elif result == "action":
+           return render_template('login_error_action.html') 
+        elif result == "wait":
+            return render_template('login_error_wait.html')
         else:
             return render_template('login.html', error=True)
     return redirect('/')
@@ -80,32 +83,37 @@ def submit():
 
 def login(schoolid, password):
     table = tpSQL.getTable('event')
-
-    global data
-    data = table.set_index('id').T.to_dict()[schoolid]
-    data['date'] = str(data['date']).split()[0]
-    data['id'] = schoolid
-    data['hosts'] = []
-    host_table = tpSQL.getTable('host')
-    tree_table = tpSQL.getTable('tree')
-    data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
-    data['trees'] = []
-    for host in data['hosts']:
-        if type(host['photo_x']) == pd._libs.missing.NAType:
-            host['photo_x'] = 0
-        if type(host['photo_y']) == pd._libs.missing.NAType:
-            host['photo_y'] = 0
-        if type(host['photo_zoom']) == pd._libs.missing.NAType:
-            host['photo_zoom'] = 100
-    for index, row in tree_table.iterrows():
-        if row['event_id'] == schoolid:
-            tree_info = {'name' : row['species'], 'image_link' : tree_photos[row['species']]}
-            data['trees'].append(tree_info)
-
-    if len(table.loc[table['id'] == schoolid]['pwd'].values) == 0:
+    if schoolid not in table['id'].values:
         return None
     if password == table.loc[table['id'] == schoolid]['pwd'].values[0]:
-        return table.loc[table['id'] == schoolid]['name'].values[0]
+        scheduler_info = tpSQL.getTable('scheduler')
+        scheduler_info = scheduler_info[scheduler_info['event_id'] == schoolid].iloc[0].to_dict()
+        if not scheduler_info['submitted_tree_info'] and not scheduler_info['valid_species']:
+            return 'action'
+        elif scheduler_info['submitted_tree_info'] and not scheduler_info['valid_species']:
+            return 'wait'
+
+        global data
+        data = table.set_index('id').T.to_dict()[schoolid]
+        data['date'] = str(data['date']).split()[0]
+        data['id'] = schoolid
+        data['hosts'] = []
+        host_table = tpSQL.getTable('host')
+        tree_table = tpSQL.getTable('tree')
+        data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
+        data['trees'] = []
+        for host in data['hosts']:
+            if type(host['photo_x']) == pd._libs.missing.NAType:
+                host['photo_x'] = 0
+            if type(host['photo_y']) == pd._libs.missing.NAType:
+                host['photo_y'] = 0
+            if type(host['photo_zoom']) == pd._libs.missing.NAType:
+                host['photo_zoom'] = 100
+        for index, row in tree_table.iterrows():
+            if row['event_id'] == schoolid:
+                tree_info = {'name' : row['species'], 'image_link' : tree_photos[row['species']]}
+                data['trees'].append(tree_info)
+        return 'ready'
     else:
         return None
 
