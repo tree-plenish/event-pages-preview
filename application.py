@@ -10,6 +10,7 @@ from pathlib import Path
 import sys
 import importlib
 import pandas as pd
+from random import randrange
 
 from trees import tree_photos
 
@@ -171,7 +172,7 @@ def process_data(form, files):
         # 3) google drive link
         host_exists = False
         for host in data['hosts']:
-            if host['name'] == form['host' + str(i) + '_name']:
+            if host['uuid'] == form['host' + str(i) + '_uuid']:
                 host_exists = True
                 host['new'] = False
                 host['bio'] = form['host' + str(i) + '_bio']
@@ -182,6 +183,7 @@ def process_data(form, files):
         if not host_exists:
             data['hosts'].append({
                 'new' : True,
+                'uuid' : new_host_uuid(),
                 'name' : form['host' + str(i) + '_name'],
                 'bio' : form['host' + str(i) + '_bio'],
                 'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
@@ -193,6 +195,13 @@ def process_data(form, files):
 
     # print(data)
     return data
+
+def new_host_uuid():
+    uuid = randrange(10000, 100000)
+    uuid_list = tpSQL.getColData('host', ['uuid']).values
+    while uuid in uuid_list:
+        uuid = randrange(10000, 100000)
+    return uuid
 
 def submit_to_database(data):
     print(data)
