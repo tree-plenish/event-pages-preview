@@ -98,7 +98,6 @@ def login(schoolid, password):
         data = table.set_index('id').T.to_dict()[schoolid]
         data['date'] = str(data['date']).split()[0]
         data['id'] = schoolid
-        data['hosts'] = []
         host_table = tpSQL.getTable('host')
         tree_table = tpSQL.getTable('tree')
         data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
@@ -149,7 +148,6 @@ def process_data(form, files):
     else:
         data['is_pickup_only'] = False
 
-    data['hosts'] = []
     i = 1
     while 'host' + str(i) + '_name' in form:
         # 1) save photo file
@@ -172,7 +170,7 @@ def process_data(form, files):
         # 3) google drive link
         host_exists = False
         for host in data['hosts']:
-            if host['uuid'] == form['host' + str(i) + '_uuid']:
+            if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == int(form['host' + str(i) + '_uuid']):
                 host_exists = True
                 host['new'] = False
                 host['bio'] = form['host' + str(i) + '_bio']
@@ -193,30 +191,23 @@ def process_data(form, files):
             })
         i += 1
 
-    # print(data)
+    print(data)
     return data
 
 def new_host_uuid():
-    uuid = randrange(10000, 100000)
+    uuid = randrange(1000000000, 10000000000)
     uuid_list = tpSQL.getColData('host', ['uuid']).values
     while uuid in uuid_list:
-        uuid = randrange(10000, 100000)
+        uuid = randrange(1000000000, 10000000000)
     return uuid
 
 def submit_to_database(data):
     print(data)
-    # todo: use a row update instead? 
-    tpSQL.batchUpdate('event', 'id', 'name', [data['id']], [data['name']])
-    tpSQL.batchUpdate('event', 'id', 'state', [data['id']], [data['state']])
-    # tpSQL.batchUpdate('school', 'id', 'date', [data['id']], [data['date']])
+    tpSQL.batchUpdate2('event', 'id', 
+                        [[data['id'], data['name'], data['state'], data['date'], data['tree_goal'], data['media_type'] == 'Video', data['bio'], data['video'], data['display_email'], data['is_pickup_only']]], 
+                        colLst=['id', 'name', 'state', 'date', 'tree_goal', 'media_type_video', 'bio', 'video', 'display_email', 'is_pickup_only'])
 
-    tpSQL.batchUpdate('event', 'id', 'tree_goal', [data['id']], [data['tree_goal']])
-    # why no more media_type?
-    # tpSQL.batchUpdate('school', 'schoolid', 'date', [data['id']], [data['media_type']])
-    tpSQL.batchUpdate('event', 'id', 'bio', [data['id']], [data['text']])
-    tpSQL.batchUpdate('event', 'id', 'video', [data['id']], [data['video']])
-    tpSQL.batchUpdate('event', 'id', 'display_email', [data['id']], [data['display_email']])
-    tpSQL.batchUpdate('event', 'id', 'is_pickup_only', [data['id']], [data['is_pickup_only']])
+    # tpSQL.batchUpdate('school', 'id', 'date', [data['id']], [data['date']])
 
     # # hosts
     # for host in data['hosts']:
