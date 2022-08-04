@@ -21,6 +21,13 @@ var activeImgIdx;
 
 
 window.addEventListener('load', function() {
+    if (data.media_type_video) {
+        document.getElementById('video').setAttribute("checked", "");
+        selectMediaType(document.getElementById('video'));
+    } else {
+        document.getElementById('text').setAttribute("checked", "");
+        selectMediaType(document.getElementById('text'));
+    }
     var host_num = 1;
     for (const host of data.hosts) {
         if (!document.getElementById('host' + host_num + '-name')) {

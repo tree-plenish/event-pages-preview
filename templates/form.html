@@ -30,9 +30,9 @@
             <label>Event Type</label>
             <br>
             <div class="radio-group">
-              <input type="radio" id="text" name="is_pickup_only" value="True" required {{ "checked" if data.is_pickup_only }}>
+              <input type="radio" id="pickup" name="is_pickup_only" value="True" required {{ "checked" if data.is_pickup_only }}>
               <label for="True">Pickup Only</label>
-              <input type="radio" id="video" name="is_pickup_only" value="False" required {{ "checked" if not data.is_pickup_only }}>
+              <input type="radio" id="volunteer" name="is_pickup_only" value="False" required {{ "checked" if not data.is_pickup_only }}>
               <label for="False">Volunteer Planting</label>
             </div>
           </div>
