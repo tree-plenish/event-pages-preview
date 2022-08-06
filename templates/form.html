@@ -30,9 +30,9 @@
             <label>Event Type</label>
             <br>
             <div class="radio-group">
-              <input type="radio" id="text" name="is_pickup_only" value="True" required {{ "checked" if data.is_pickup_only }}>
+              <input type="radio" id="pickup" name="is_pickup_only" value="True" required {{ "checked" if data.is_pickup_only }}>
               <label for="True">Pickup Only</label>
-              <input type="radio" id="video" name="is_pickup_only" value="False" required {{ "checked" if not data.is_pickup_only }}>
+              <input type="radio" id="volunteer" name="is_pickup_only" value="False" required {{ "checked" if not data.is_pickup_only }}>
               <label for="False">Volunteer Planting</label>
             </div>
           </div>
@@ -69,7 +69,8 @@
 
           <div id="host-fields">
             <div class="host-field">
-              <h4>Host 1</h4>
+              <h4>Host 1 (Primary)</h4>
+              <input id="host1-uuid" type="hidden" name="host1_uuid" required>
               <div class="form-group">
                 <label>Name</label>
                 <input id="host1-name" type="text" class="form-control" name="host1_name" placeholder="" required>

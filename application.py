@@ -10,6 +10,8 @@ from pathlib import Path
 import sys
 import importlib
 import pandas as pd
+from random import randrange
+import re
 
 from trees import tree_photos
 
@@ -97,12 +99,15 @@ def login(schoolid, password):
         data = table.set_index('id').T.to_dict()[schoolid]
         data['date'] = str(data['date']).split()[0]
         data['id'] = schoolid
-        data['hosts'] = []
         host_table = tpSQL.getTable('host')
         tree_table = tpSQL.getTable('tree')
         data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
         data['trees'] = []
         for host in data['hosts']:
+            if host['photo'] == 'static/images/default_profile.png':
+                host['photo'] = ''
+            elif 'https://drive.google.com/uc?export=view&id=' in host['photo']:
+                host['photo'] = host['photo'].split('https://drive.google.com/uc?export=view&id=')[1]
             if type(host['photo_x']) == pd._libs.missing.NAType:
                 host['photo_x'] = 0
             if type(host['photo_y']) == pd._libs.missing.NAType:
@@ -148,30 +153,11 @@ def process_data(form, files):
     else:
         data['is_pickup_only'] = False
 
-    data['hosts'] = []
     i = 1
     while 'host' + str(i) + '_name' in form:
-        # 1) save photo file
-        # f = request.files['host' + str(i) + '_photo']
-        # filename = secure_filename(f.filename)
-        # if filename != '':
-        #     file_ext = os.path.splitext(filename)[1]
-        #     if file_ext not in application.config['UPLOAD_EXTENSIONS']:
-        #         abort(400)
-        #     f.save(os.path.join(application.config['UPLOAD_PATH'], filename))
-
-        # 2) use decoded image data directly
-        # data['hosts'].append({
-        #     'name' : form['host' + str(i) + '_name'],
-        #     'bio' : form['host' + str(i) + '_bio'],
-        #     'photo': 'data:image/jpeg;base64,' + base64.b64encode(files['host' + str(i) + '_photo'].read()).decode() if files['host' + str(i) + '_photo'].filename != '' else 'static/images/default_profile.png'
-        #     # 'photo' : 'static/uploads/' + filename if filename != '' else 'static/images/default_profile.png'
-        # })
-
-        # 3) google drive link
         host_exists = False
         for host in data['hosts']:
-            if host['name'] == form['host' + str(i) + '_name']:
+            if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == int(form['host' + str(i) + '_uuid']):
                 host_exists = True
                 host['new'] = False
                 host['bio'] = form['host' + str(i) + '_bio']
@@ -179,52 +165,54 @@ def process_data(form, files):
                 host['photo_x'] = form['host' + str(i) + '_photo_x']
                 host['photo_y'] = form['host' + str(i) + '_photo_y']
                 host['photo_zoom'] = form['host' + str(i) + '_photo_zoom']
+                host['primary'] = (i == 1)
         if not host_exists:
             data['hosts'].append({
                 'new' : True,
+                'uuid' : new_host_uuid(),
                 'name' : form['host' + str(i) + '_name'],
                 'bio' : form['host' + str(i) + '_bio'],
                 'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
                 'photo_x': form['host' + str(i) + '_photo_x'],
                 'photo_y': form['host' + str(i) + '_photo_y'],
                 'photo_zoom': form['host' + str(i) + '_photo_zoom'],
+                'primary' : i == 1
             })
         i += 1
 
-    # print(data)
+    print(data)
     return data
+
+def new_host_uuid():
+    uuid = randrange(1000000000, 10000000000)
+    uuid_list = tpSQL.getColData('host', ['uuid']).values
+    while uuid in uuid_list:
+        uuid = randrange(1000000000, 10000000000)
+    return uuid
 
 def submit_to_database(data):
     print(data)
-    # todo: use a row update instead? 
-    tpSQL.batchUpdate('event', 'id', 'name', [data['id']], [data['name']])
-    tpSQL.batchUpdate('event', 'id', 'state', [data['id']], [data['state']])
-    # tpSQL.batchUpdate('school', 'id', 'date', [data['id']], [data['date']])
+    tpSQL.batchUpdate2('event', 'id', 
+        [[data['id'], data['name'], data['state'], data['date'], data['tree_goal'], data['media_type'] == 'Video', data['bio'], data['video'], data['display_email'], data['is_pickup_only']]], 
+        colLst=['id', 'name', 'state', 'date', 'tree_goal', 'media_type_video', 'bio', 'video', 'display_email', 'is_pickup_only'])
 
-    tpSQL.batchUpdate('event', 'id', 'tree_goal', [data['id']], [data['tree_goal']])
-    # why no more media_type?
-    # tpSQL.batchUpdate('school', 'schoolid', 'date', [data['id']], [data['media_type']])
-    tpSQL.batchUpdate('event', 'id', 'bio', [data['id']], [data['text']])
-    tpSQL.batchUpdate('event', 'id', 'video', [data['id']], [data['video']])
-    tpSQL.batchUpdate('event', 'id', 'display_email', [data['id']], [data['display_email']])
-    tpSQL.batchUpdate('event', 'id', 'is_pickup_only', [data['id']], [data['is_pickup_only']])
-
-    # # hosts
-    # for host in data['hosts']:
-    #     if 'new' in host:
-    #         if host['new'] == True:
-    #             # get next uuid
-    #             uuid = tpSQL.getColData('host', ['uuid']).max().values[0] + 1
-    #             tpSQL.batchInsert('host', [[uuid, data['id'], host['name']]], cols=['uuid', 'event_id', 'name']) # need to add bio and photo, etc. 
-    #         else:
-    #             pass
-    #             # tpSQL.batchUpdate('host', 'name') # better to check both name and event id, but need functionality from tpsql
-    #     else: # host was in db before, but was deleted from form. Delete from db?
-    #         pass
-
-    # trees
+    for host in data['hosts']:
+        if 'new' in host:
+            if host['new'] == True:
+                tpSQL.batchInsert('host', 
+                    [[host['uuid'], data['id'], host['name'], host['primary'], host['bio'], host['photo'], int(re.sub('\D', '', host['photo_x'])), int(re.sub('\D', '', host['photo_y'])), int(re.sub('\D', '', host['photo_zoom']))]], 
+                    colLst=['uuid', 'event_id', 'name', 'is_primary', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
+            else:
+                tpSQL.batchUpdate2('host', 'uuid', 
+                    [[host['uuid'], data['id'], host['name'], host['primary'], host['bio'], host['photo'], int(re.sub('\D', '', host['photo_x'])), int(re.sub('\D', '', host['photo_y'])), int(re.sub('\D', '', host['photo_zoom']))]], 
+                    colLst=['uuid', 'event_id', 'name', 'is_primary', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
+        else: 
+            # host was in db before, but was deleted from form. Delete from db
+            tpSQL.host_tbl_delete_row(host['uuid'])
+            pass
 
     print(tpSQL.getTable('event'))
+    print(tpSQL.getTable('host'))
 
 if __name__ == "__main__":
     application.run()

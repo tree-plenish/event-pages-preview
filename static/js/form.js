@@ -21,12 +21,20 @@ var activeImgIdx;
 
 
 window.addEventListener('load', function() {
+    if (data.media_type_video) {
+        document.getElementById('video').setAttribute("checked", "");
+        selectMediaType(document.getElementById('video'));
+    } else {
+        document.getElementById('text').setAttribute("checked", "");
+        selectMediaType(document.getElementById('text'));
+    }
     var host_num = 1;
     for (const host of data.hosts) {
         if (!document.getElementById('host' + host_num + '-name')) {
             add_host_field();
         }
         document.getElementById('host' + host_num + '-name').value = host.name;
+        document.getElementById('host' + host_num + '-uuid').value = host.uuid;
         document.getElementById('host' + host_num + '-bio').value = host.bio;
         document.getElementById('host' + host_num + '-photo').value = host.photo;
         document.getElementById('host' + host_num + '-photo-x').value = host.photo_x + 'px';
@@ -57,7 +65,13 @@ function add_host_field() {
     var title = document.createElement('h4');
     title.innerHTML = 'Host ' + host_num;
 
+    var uuid = document.createElement('input');
+    uuid.setAttribute('id', "host" + host_num + "-uuid");
+    uuid.setAttribute('name', "host" + host_num + "_uuid");
+    uuid.setAttribute('type', "hidden");
+
     field_group.appendChild(title);
+    field_group.appendChild(uuid);
     field_group.appendChild(host_field('Name', 'text', 'host' + host_num + '_name', true, null, false));
     field_group.appendChild(host_field('Bio', 'text', 'host' + host_num + '_bio', true, null, false));
     field_group.appendChild(host_field('Photo', 'text', 'host' + host_num + '_photo', false, null, false));
