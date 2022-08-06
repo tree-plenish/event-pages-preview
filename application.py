@@ -208,6 +208,7 @@ def submit_to_database(data):
                     colLst=['uuid', 'event_id', 'name', 'is_primary', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
         else: 
             # host was in db before, but was deleted from form. Delete from db
+            tpSQL.host_tbl_delete_row(host['uuid'])
             pass
 
     print(tpSQL.getTable('event'))
