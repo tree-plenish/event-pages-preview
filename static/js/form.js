@@ -36,10 +36,10 @@ window.addEventListener('load', function() {
         document.getElementById('host' + host_num + '-name').value = host.name;
         document.getElementById('host' + host_num + '-uuid').value = host.uuid;
         document.getElementById('host' + host_num + '-bio').value = host.bio;
-        document.getElementById('host' + host_num + '-photo').value = host.photo;
-        document.getElementById('host' + host_num + '-photo-x').value = host.photo_x + 'px';
-        document.getElementById('host' + host_num + '-photo-y').value = host.photo_y + 'px';
-        document.getElementById('host' + host_num + '-photo-zoom').value = host.photo_zoom + '%';
+        document.getElementById('host' + host_num + '-photo').value = host.form_photo;
+        document.getElementById('host' + host_num + '-photo-x').value = host.photo_x;
+        document.getElementById('host' + host_num + '-photo-y').value = host.photo_y;
+        document.getElementById('host' + host_num + '-photo-zoom').value = host.photo_zoom;
         host_num++;
     }
     var tree_num = 1;
@@ -79,9 +79,9 @@ function add_host_field() {
 
     var img_options_group = document.createElement('div');
     img_options_group.setAttribute('class', 'inline-input-group');
-    img_options_group.appendChild(host_field('x-offset', 'text', 'host' + host_num + '_photo_x', false, '0px', true));
-    img_options_group.appendChild(host_field('y-offset', 'text', 'host' + host_num + '_photo_y', false, '0px', true));
-    img_options_group.appendChild(host_field('zoom', 'text', 'host' + host_num + '_photo_zoom', false, '100%', true));
+    img_options_group.appendChild(host_field('x-offset', 'text', 'host' + host_num + '_photo_x', false, '0', true));
+    img_options_group.appendChild(host_field('y-offset', 'text', 'host' + host_num + '_photo_y', false, '0', true));
+    img_options_group.appendChild(host_field('zoom', 'text', 'host' + host_num + '_photo_zoom', false, '100', true));
     var btn = document.createElement('button');
     btn.setAttribute('id', "host" + host_num +  "-crop-button");
     btn.setAttribute('class', "crop-button");
@@ -169,9 +169,9 @@ function openModal(i) {
         modal.style.display = "block";
 
         modalImage.style['background-image'] = "url(https://drive.google.com/uc?export=view&id=" + imgId + ")";
-        modalImage.style['background-position-x'] = document.getElementById("host" + i + "-photo-x").value;
-        modalImage.style['background-position-y'] = document.getElementById("host" + i + "-photo-y").value;
-        modalImage.style['background-size'] = document.getElementById("host" + i + "-photo-zoom").value;
+        modalImage.style['background-position-x'] = document.getElementById("host" + i + "-photo-x").value + 'px';
+        modalImage.style['background-position-y'] = document.getElementById("host" + i + "-photo-y").value + 'px';
+        modalImage.style['background-size'] = document.getElementById("host" + i + "-photo-zoom").value + '%';
     } else {
         errorModal.style.display = "block";
     }
@@ -180,9 +180,9 @@ function openModal(i) {
 confirmImage.onclick = function() {
     modal.style.display = "none";
     modalImageError.style.display = 'none';
-    document.getElementById("host" + activeImgIdx + "-photo-x").value = modalImage.style['background-position-x'];
-    document.getElementById("host" + activeImgIdx + "-photo-y").value = modalImage.style['background-position-y'];
-    document.getElementById("host" + activeImgIdx + "-photo-zoom").value = modalImage.style['background-size'];
+    document.getElementById("host" + activeImgIdx + "-photo-x").value = modalImage.style['background-position-x'].replace('px', '');
+    document.getElementById("host" + activeImgIdx + "-photo-y").value = modalImage.style['background-position-y'].replace('px', '');
+    document.getElementById("host" + activeImgIdx + "-photo-zoom").value = modalImage.style['background-size'].replace('%', '');
 }
 
 spanError.onclick = function() {
