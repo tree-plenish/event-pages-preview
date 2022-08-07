@@ -68,10 +68,6 @@ a{
     margin: 0;
 }
 
-#topnav form {
-    display: inline;
-}
-
 /* When the screen is less than 600 pixels wide, hide all links, except for the first one ("Home"). Show the link that contains should open and close the topnav (.icon) */
 /* @media screen and (max-width: 600px) {
     #topnav li:not(:first-child) {display: none;}
@@ -118,6 +114,10 @@ a{
     color: white;
     padding-top: 60px;
 }
+#main-header a{
+    color:#80ba52;
+}
+
 #main-header h1{
     padding: 15%;
     margin: 0;
