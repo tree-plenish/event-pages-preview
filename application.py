@@ -1,13 +1,10 @@
-from flask import Flask, render_template, request, redirect, abort
-from data import eventData
-# from werkzeug.utils import secure_filename
-# import os
-# import base64
+from flask import Flask, render_template, request, redirect, session
 
 import datetime
 from dateutil.relativedelta import relativedelta
 from pathlib import Path
 import sys
+import os
 import importlib
 import pandas as pd
 from random import randrange
@@ -31,14 +28,9 @@ importlib.import_module(__package__)
 from tech_team_database.dependencies.DatabaseSQLOperations import TpSQL
 
 application = Flask(__name__)
-
-# application.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-# application.config['MAX_CONTENT_PATH'] = 1024*1024*1024
-# application.config['UPLOAD_PATH'] = 'static/uploads'
-# application.config['UPLOAD_EXTENSIONS'] = ['.jpg', '.png', '.gif']
+application.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
 
 tpSQL = TpSQL(schema='tp2022')
-data = {}
 
 # login page
 @application.route('/index')
@@ -49,34 +41,35 @@ def index():
 # event info form
 @application.route("/form", methods=["GET", "POST"])
 def form():
-    if request.method == "POST":
+    if request.method == "POST" and request.form:
         result = login(int(request.form['schoolid']), int(request.form['password']))
         if result == "ready":
-            print(data)
-            return render_template('form.html', data=data)
+            # print(session.get('data'))
+            return render_template('form.html', data=session.get('data'))
         elif result == "action":
            return render_template('login_error_action.html') 
         elif result == "wait":
             return render_template('login_error_wait.html')
         else:
             return render_template('login.html', error=True)
+    elif request.method == "POST":
+        return render_template('form.html', data=session.get('data'))
     return redirect('/')
 
 # preview page
 @application.route("/preview", methods=["GET", "POST"])
 def preview():
     if request.method == "POST":
-        global data
-        data = process_data(request.form, request.files)
-        print(data)
-        return render_template("school_event.html", event=data, school=data['name'])
+        session['data'] = process_data(request.form, request.files)
+        # print(session.get('data'))
+        return render_template("school_event.html", event=session.get('data'), school=session.get('data')['name'])
     return redirect('/')
 
 # submitted page
 @application.route("/submit", methods=["GET", "POST"])
 def submit():
     if request.method == "POST":
-        submit_to_database(data)
+        submit_to_database(session.get('data'))
         return render_template("submit.html")
     return redirect('/')
 
@@ -95,9 +88,8 @@ def login(schoolid, password):
         elif scheduler_info['submitted_tree_info'] and not scheduler_info['valid_species']:
             return 'wait'
 
-        global data
         data = table.set_index('id').T.to_dict()[schoolid]
-        data['date'] = str(data['date']).split()[0]
+        data['form_date'] = str(data['date']).split()[0]
         data['id'] = schoolid
         host_table = tpSQL.getTable('host')
         tree_table = tpSQL.getTable('tree')
@@ -105,9 +97,9 @@ def login(schoolid, password):
         data['trees'] = []
         for host in data['hosts']:
             if host['photo'] == 'static/images/default_profile.png':
-                host['photo'] = ''
+                host['form_photo'] = ''
             elif 'https://drive.google.com/uc?export=view&id=' in host['photo']:
-                host['photo'] = host['photo'].split('https://drive.google.com/uc?export=view&id=')[1]
+                host['form_photo'] = host['photo'].split('https://drive.google.com/uc?export=view&id=')[1]
             if type(host['photo_x']) == pd._libs.missing.NAType:
                 host['photo_x'] = 0
             if type(host['photo_y']) == pd._libs.missing.NAType:
@@ -118,6 +110,7 @@ def login(schoolid, password):
             if row['event_id'] == schoolid:
                 tree_info = {'name' : row['species'], 'image_link' : tree_photos[row['species']]}
                 data['trees'].append(tree_info)
+        session['data'] = data
         return 'ready'
     else:
         return None
@@ -125,13 +118,14 @@ def login(schoolid, password):
 def process_data(form, files):
     # print(form)
     # print(files)
-    
+    data = session.get('data')
     data['name'] = form['name']
     data['state'] = form['state']
 
     date = datetime.datetime.strptime(form['date'], '%Y-%m-%d').date()
     date_minus_month =  date - relativedelta(months=1)
     data['order_deadline'] = date_minus_month.strftime('%B %d, %Y').replace(" 0", " ")
+    data['form_date'] = form['date']
     data['date'] = date.strftime('%B %d, %Y').replace(" 0", " ")
     
     data['tree_goal'] = int(form['tree_goal'])
@@ -159,28 +153,30 @@ def process_data(form, files):
         for host in data['hosts']:
             if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == int(form['host' + str(i) + '_uuid']):
                 host_exists = True
-                host['new'] = False
+                host['new'] = host['new'] if 'new' in host else False
                 host['bio'] = form['host' + str(i) + '_bio']
+                host['form_photo'] = form['host' + str(i) + '_photo']
                 host['photo'] = 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
                 host['photo_x'] = form['host' + str(i) + '_photo_x']
                 host['photo_y'] = form['host' + str(i) + '_photo_y']
                 host['photo_zoom'] = form['host' + str(i) + '_photo_zoom']
-                host['primary'] = (i == 1)
+                # host['primary'] = (i == 1)
         if not host_exists:
             data['hosts'].append({
                 'new' : True,
                 'uuid' : new_host_uuid(),
                 'name' : form['host' + str(i) + '_name'],
                 'bio' : form['host' + str(i) + '_bio'],
+                'form_photo' : form['host' + str(i) + '_photo'],
                 'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
                 'photo_x': form['host' + str(i) + '_photo_x'],
                 'photo_y': form['host' + str(i) + '_photo_y'],
-                'photo_zoom': form['host' + str(i) + '_photo_zoom'],
-                'primary' : i == 1
+                'photo_zoom': form['host' + str(i) + '_photo_zoom']
+                # 'primary' : i == 1
             })
         i += 1
 
-    print(data)
+    # print(data)
     return data
 
 def new_host_uuid():
@@ -200,12 +196,12 @@ def submit_to_database(data):
         if 'new' in host:
             if host['new'] == True:
                 tpSQL.batchInsert('host', 
-                    [[host['uuid'], data['id'], host['name'], host['primary'], host['bio'], host['photo'], int(re.sub('\D', '', host['photo_x'])), int(re.sub('\D', '', host['photo_y'])), int(re.sub('\D', '', host['photo_zoom']))]], 
-                    colLst=['uuid', 'event_id', 'name', 'is_primary', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
+                    [[host['uuid'], data['id'], host['name'], host['bio'], host['photo'], int(host['photo_x']), int(host['photo_y']), int(host['photo_zoom'])]], 
+                    colLst=['uuid', 'event_id', 'name', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
             else:
                 tpSQL.batchUpdate2('host', 'uuid', 
-                    [[host['uuid'], data['id'], host['name'], host['primary'], host['bio'], host['photo'], int(re.sub('\D', '', host['photo_x'])), int(re.sub('\D', '', host['photo_y'])), int(re.sub('\D', '', host['photo_zoom']))]], 
-                    colLst=['uuid', 'event_id', 'name', 'is_primary', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
+                    [[host['uuid'], data['id'], host['name'], host['bio'], host['photo'], int(host['photo_x']), int(host['photo_y']), int(host['photo_zoom'])]], 
+                    colLst=['uuid', 'event_id', 'name', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
         else: 
             # host was in db before, but was deleted from form. Delete from db
             tpSQL.host_tbl_delete_row(host['uuid'])
