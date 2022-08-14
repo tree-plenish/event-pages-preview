@@ -151,7 +151,7 @@ hr{
 
 #goalMsg{
     background-color: #80ba52;
-    padding: 10% 15%;
+    padding: 5% 15%;
     text-align: left;
     color: white;
     line-height: 2em;
@@ -191,6 +191,8 @@ hr{
 }
 #footer h1{
     color: white;
+    padding: 0% 10%;
+    /* font-size: 80%; */
 }
 .circleCropper{
     width: 200px;
@@ -460,7 +462,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     flex: 1 0 100%; /*size on small screens*/
     box-sizing: border-box;
     padding: 8%;
-    font-size: 1.3em;
+    font-size: 0.8em;
 }
 /*2 cards*/
 @media screen and (min-width: 850px) {

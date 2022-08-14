@@ -8,7 +8,7 @@ import os
 import importlib
 import pandas as pd
 from random import randrange
-import re
+import uuid
 
 from trees import tree_photos
 
@@ -77,7 +77,8 @@ def submit():
 # helper functions below:
 
 def login(schoolid, password):
-    table = tpSQL.getTable('event')
+    table = tpSQL.getTable('event').fillna(0).replace(['nan'], [''])
+    treeInfo = tpSQL.getTable('tree_info')
     if schoolid not in table['id'].values:
         return None
     if password == table.loc[table['id'] == schoolid]['pwd'].values[0]:
@@ -108,7 +109,7 @@ def login(schoolid, password):
                 host['photo_zoom'] = 100
         for index, row in tree_table.iterrows():
             if row['event_id'] == schoolid:
-                tree_info = {'name' : row['species'], 'image_link' : tree_photos[row['species']]}
+                tree_info = {'name' : row['species'], 'image_link' : treeInfo[treeInfo['species'] == row['species']]['image_link'].values[0]}
                 data['trees'].append(tree_info)
         session['data'] = data
         return 'ready'
@@ -151,7 +152,7 @@ def process_data(form, files):
     while 'host' + str(i) + '_name' in form:
         host_exists = False
         for host in data['hosts']:
-            if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == int(form['host' + str(i) + '_uuid']):
+            if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == form['host' + str(i) + '_uuid']:
                 host_exists = True
                 host['new'] = host['new'] if 'new' in host else False
                 host['bio'] = form['host' + str(i) + '_bio']
@@ -180,11 +181,11 @@ def process_data(form, files):
     return data
 
 def new_host_uuid():
-    uuid = randrange(1000000000, 10000000000)
+    new_uuid = str(uuid.uuid4())
     uuid_list = tpSQL.getColData('host', ['uuid']).values
     while uuid in uuid_list:
-        uuid = randrange(1000000000, 10000000000)
-    return uuid
+        new_uuid = str(uuid.uuid4())
+    return new_uuid
 
 def submit_to_database(data):
     print(data)
@@ -207,6 +208,10 @@ def submit_to_database(data):
             tpSQL.host_tbl_delete_row(host['uuid'])
             pass
 
+    tpSQL.batchUpdate2('scheduler', 'event_id',
+                    [[1000, True]], 
+                    colLst=['event_id', 'submitted_epf']) 
+    
     print(tpSQL.getTable('event'))
     print(tpSQL.getTable('host'))
 
