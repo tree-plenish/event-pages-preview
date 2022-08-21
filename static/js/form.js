@@ -63,7 +63,7 @@ function add_host_field() {
     field_group.setAttribute('class', 'host-field');
 
     var title = document.createElement('h4');
-    title.innerHTML = 'Host ' + host_num;
+    title.innerHTML = 'Team Member ' + host_num;
 
     var uuid = document.createElement('input');
     uuid.setAttribute('id', "host" + host_num + "-uuid");
