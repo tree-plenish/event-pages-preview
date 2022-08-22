@@ -91,6 +91,7 @@ def login(schoolid, password):
 
         data = table.set_index('id').T.to_dict()[schoolid]
         data['form_date'] = str(data['date']).split()[0]
+        data['display_video'] = data['video']
         data['id'] = schoolid
         host_table = tpSQL.getTable('host')
         tree_table = tpSQL.getTable('tree')
@@ -132,13 +133,13 @@ def process_data(form, files):
     data['tree_goal'] = int(form['tree_goal'])
     data['media_type'] = form['media_type']
     data['text'] = form['text']
-    data['video'] = form['video']
+    data['display_video'] = form['video']
     if 'youtu.be' in data['video']:
-        data['video'] = "https://www.youtube.com/embed/" + data['video'].split('.be/',1)[1].split('&')[0]
+        data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('.be/',1)[1].split('&')[0]
     elif 'youtube.com/watch?' in data['video']:
-        data['video'] = "https://www.youtube.com/embed/" + data['video'].split('/watch?v=',1)[1].split('&')[0]
+        data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('/watch?v=',1)[1].split('&')[0]
     elif 'drive.google.com' in data['video']:
-        data['video'] = data['video'].replace('view','preview')
+        data['video'] = data['display_video'].replace('view','preview')
 
 
     data['display_email'] = form['display_email']
@@ -177,7 +178,6 @@ def process_data(form, files):
             })
         i += 1
 
-    # print(data)
     return data
 
 def new_host_uuid():
