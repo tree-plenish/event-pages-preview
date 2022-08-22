@@ -68,8 +68,8 @@
                 <p>saplings</p>
             </div>
             <div class="half">
-                <h1 style="display: inline">{{ "%.1f"|format(event.tree_goal*1.2|float) }}</h1>
-                <p>lbs of carbon replaced</p>
+                <h1 style="display: inline">{{ "%.1d"|format((event.tree_goal*1.2)|int) }}</h1>
+                <p>tons of carbon replaced</p>
             </div>
         </div>
     <!-- </div> -->
@@ -148,6 +148,25 @@
     {# <h3>Visit the Resources page for more info!</h3> #}
 </div>
 
+<div id="saplingInfo">
+    <h1>Sapling Information</h1>
+    <div class="split">
+        <div class="half">
+            <p>Saplings will come as bareroot saplings. This means they are dormant until they are planted and 
+                typically bloom 4-6 weeks after being planted. Here is an example of what bareroot saplings look like.</p>
+            <br>
+            <p>For more information about the saplings and for resources about how to plant and care for them, 
+                visit the Tree-Plenish Resource page.</p>
+            <a href="http://www.tree-plenish.org/resources" class="button">Resource Page</a>
+        </div>
+        <div class="half">
+            <img src="/static/images/saplings.jpg">
+            <p class="footnote">Note: actual size of sapling varies by species and is listed on the order form</p>
+
+        </div>
+    </div>
+
+</div>
 
 <div id="team">
     <h1 class="divHead">Meet The Team</h1>

@@ -157,7 +157,52 @@ hr{
     line-height: 2em;
 }
 
+#saplingInfo{
+    background-color: #80ba52;
+    padding-top: 8%;
+    padding-bottom: 6%;
+    text-align: left;
+    color: white;
+    line-height: 2em;
+}
 
+#saplingInfo p {
+    margin-top: 0;
+    line-height: 1.5em;
+}
+
+#saplingInfo .button {
+    background-color: #016d30;
+    text-align: center;
+    margin: 0;
+}
+
+#saplingInfo img {
+    width: 100%;
+    border: #2c7a4e;
+    border-width: 10px;
+    border-style: solid;
+}
+
+#saplingInfo h1 {
+    color: #2c7a4e;
+    text-align: center;
+    font-size: 3em;
+    /* margin-bottom: 0.8em; */
+    line-height: 1.2em;
+}
+
+#saplingInfo .half {
+    padding: 4%;
+}
+
+#saplingInfo .split {
+    margin: 0 8%;
+}
+
+.footnote {
+    font-size: 80%;
+}
 
 .button{
     transition: 0.5s;
