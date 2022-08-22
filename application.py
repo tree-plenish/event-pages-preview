@@ -13,12 +13,7 @@ import uuid
 # Add parent directory to PYTHONPATH to be able to find package.
 file = Path(__file__).resolve()
 parent, top = file.parent, file.parents[1] # 2
-
 sys.path.append(str(top))
-try:
-    sys.path.remove(str(parent))
-except ValueError:
-    pass
 
 __package__ = '.'.join(parent.parts[len(top.parts):])
 importlib.import_module(__package__)
