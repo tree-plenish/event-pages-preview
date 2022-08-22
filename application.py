@@ -10,8 +10,6 @@ import pandas as pd
 from random import randrange
 import uuid
 
-from trees import tree_photos
-
 # Add parent directory to PYTHONPATH to be able to find package.
 file = Path(__file__).resolve()
 parent, top = file.parent, file.parents[1] # 2
