@@ -124,14 +124,14 @@ def process_data(form, files):
     data['date'] = date.strftime('%B %d, %Y').replace(" 0", " ")
     
     data['tree_goal'] = int(form['tree_goal'])
-    data['media_type'] = form['media_type']
-    data['text'] = form['text']
+    data['media_type_video'] = True if form['media_type'] == "Video" else False
+    data['bio'] = form['bio']
     data['display_video'] = form['video']
-    if 'youtu.be' in data['video']:
+    if 'youtu.be' in data['display_video']:
         data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('.be/',1)[1].split('&')[0]
-    elif 'youtube.com/watch?' in data['video']:
+    elif 'youtube.com/watch?' in data['display_video']:
         data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('/watch?v=',1)[1].split('&')[0]
-    elif 'drive.google.com' in data['video']:
+    elif 'drive.google.com' in data['display_video']:
         data['video'] = data['display_video'].replace('view','preview')
 
 
@@ -205,8 +205,8 @@ def submit_to_database(data):
                     [[1000, True]], 
                     colLst=['event_id', 'submitted_epf']) 
     
-    print(tpSQL.getTable('event'))
-    print(tpSQL.getTable('host'))
+    # print(tpSQL.getTable('event'))
+    # print(tpSQL.getTable('host'))
 
 if __name__ == "__main__":
     application.run()
