@@ -145,3 +145,12 @@ button:hover{
     display: none;
     color: red;
 }
+
+.form-group a {
+    color: #2c7a4e;
+}
+
+.learn-more {
+    margin-bottom: 0;
+    font-style: italic;
+}
