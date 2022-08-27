@@ -178,7 +178,7 @@ function openModal(i) {
         modalImage.style['background-position-x'] = document.getElementById("host" + i + "-photo-x").value + 'px';
         modalImage.style['background-position-y'] = document.getElementById("host" + i + "-photo-y").value + 'px';
         modalImage.style['background-size'] = document.getElementById("host" + i + "-photo-zoom").value + '%';
-        slider.setAttribute('value', document.getElementById("host" + i + "-photo-zoom").value);
+        slider.value = document.getElementById("host" + i + "-photo-zoom").value;
     } else {
         errorModal.style.display = "block";
     }
