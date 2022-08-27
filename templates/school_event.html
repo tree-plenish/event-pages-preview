@@ -204,13 +204,7 @@
         </div> #}
         {% for level in event.sponsors %}
         {% for sponsor in event.sponsors[level] %}
-            {% if sponsor.logo %}
-                <div class="logo">
-                    <img src="{{ sponsor.logo_link }}"  title="{{ sponsor.name }}" alt="{{ sponsor.name }}" style="width:250px">
-                </div> 
-            {% else %}
                 <p id="{{ level }}">{{ sponsor.name }}</p>
-            {% endif %}
         {% endfor %}
         {% endfor %}
     </div>

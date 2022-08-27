@@ -33,6 +33,11 @@ button:hover{
     box-sizing: border-box;
 }
 
+input:read-only {
+    color:#016d30;
+    background-color: #f7f7f7;
+}
+
 .inline-input-group .form-group {
     width: 12%;
     min-width: 80px;

@@ -183,8 +183,8 @@ def new_host_uuid():
 def submit_to_database(data):
     print(data)
     tpSQL.batchUpdate2('event', 'id', 
-        [[data['id'], data['name'], data['state'], data['date'], data['tree_goal'], data['media_type_video'], data['bio'], data['video'], data['display_email'], data['is_pickup_only']]], 
-        colLst=['id', 'name', 'state', 'date', 'tree_goal', 'media_type_video', 'bio', 'video', 'display_email', 'is_pickup_only'])
+        [[data['id'], data['name'], data['state'], data['media_type_video'], data['bio'], data['video'], data['display_email'], data['is_pickup_only']]], 
+        colLst=['id', 'name', 'state', 'media_type_video', 'bio', 'video', 'display_email', 'is_pickup_only'])
 
     for host in data['hosts']:
         if 'new' in host:
@@ -206,7 +206,6 @@ def submit_to_database(data):
                     colLst=['event_id', 'submitted_epf']) 
     
     # print(tpSQL.getTable('event'))
-    print(tpSQL.getTable('scheduler'))
 
 if __name__ == "__main__":
     application.run()
