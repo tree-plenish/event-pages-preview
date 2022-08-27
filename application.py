@@ -202,7 +202,7 @@ def submit_to_database(data):
             pass
 
     tpSQL.batchUpdate2('scheduler', 'event_id',
-                    [[1000, True]], 
+                    [[data['id'], True]], 
                     colLst=['event_id', 'submitted_epf']) 
     
     # print(tpSQL.getTable('event'))
