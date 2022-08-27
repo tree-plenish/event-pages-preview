@@ -24,9 +24,11 @@ window.addEventListener('load', function() {
     if (data.media_type_video) {
         document.getElementById('video').setAttribute("checked", "");
         selectMediaType(document.getElementById('video'));
+        document.getElementById('video-box').setAttribute("required", "");
     } else {
         document.getElementById('text').setAttribute("checked", "");
         selectMediaType(document.getElementById('text'));
+        document.getElementById('text-box').setAttribute("required", "");
     }
     var host_num = 1;
     for (const host of data.hosts) {
@@ -154,9 +156,13 @@ function selectMediaType(selected) {
     if (selected.value == "Text") {
         document.getElementById("text-group").style.setProperty("display", "block");
         document.getElementById("video-group").style.setProperty("display", "none");
+        document.getElementById('text-box').setAttribute("required", "");
+        document.getElementById('video-box').removeAttribute("required");
     } else {
         document.getElementById("video-group").style.setProperty("display", "block");
         document.getElementById("text-group").style.setProperty("display", "none");
+        document.getElementById('video-box').setAttribute("required", "");
+        document.getElementById('text-box').removeAttribute("required");
     }
 }
 
