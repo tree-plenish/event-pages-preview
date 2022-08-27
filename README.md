@@ -10,7 +10,7 @@ Simplified clone of event pages with database integration as infrastructure for 
 ### Deployment
 Deployed app can be accessed at http://tpeventpageform.org/
 
-This is a "dynamic" app that communicates with the database live (unlike `analytics-dash-with-events`, which is static and has data updated periodically). App updates will automatically re-deploy to Elastic Beanstalk on every push to the master branch via the Github actions workflow in `.github/workflows/main.yml`. Relevant updates to dependencies (like `tech_team_database`) will require manual re-run of the `deploy` workflow to update the deployed version, since the workflow checks out the latest version for deployment. Any files in the repository that should not be deployed should be added to `.ebignore`.
+This is a "dynamic" app that communicates with the database live (unlike `analytics-dash-with-events`, which is static and has data updated periodically). App updates will automatically re-deploy to Elastic Beanstalk on every push to the main branch via the Github actions workflow in `.github/workflows/main.yml`. Relevant updates to dependencies (like `tech_team_database`) will require manual re-run of the `deploy` workflow to update the deployed version, since the workflow checks out the latest version for deployment. Any files in the repository that should not be deployed should be added to `.ebignore`.
 
 ### Running locally
 Because Elastic Beanstalk expects the flask app to be named `application`, set the `FLASK_APP` environment variable to `application.py` before running Flask locally. To run in debug mode locally, set the environment variable instead of using the parameter in `application.run()` so that the production app is not in debug mode. For example, on Linux:
