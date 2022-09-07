@@ -29,9 +29,9 @@
             Order a sapling by {{ event.order_deadline }} to help offset {{ school }}'s energy consumption
         </h4>
         <div style="text-align: center">
-            <a href="{{ event.tree_order_link }}" class="button" style="display: inline-block">Order a Sapling</a>
-            {% if event.volunteer_link != 'NULL' and not event.pickup_only %}
-            <a href="{{ event.volunteer_link }}" class="button" style="display: inline-block">Volunteer</a>
+            <a href="#" class="button" style="display: inline-block">Order a Sapling</a>
+            {% if not event.pickup_only %}
+            <a href="#" class="button" style="display: inline-block">Volunteer</a>
             {% endif %}
         </div>
     </div>
@@ -97,7 +97,7 @@
                             </p>
                         {% endif %}
                     </div>
-                    <a href="{{ event.tree_order_link }}" class="button">Order a Sapling</a>
+                    <a href="#" class="button">Order a Sapling</a>
                 </div>
                 {% if event.volunteer_link != 'NULL' and not event.pickup_only%}
                 <div class="card min2">
@@ -107,7 +107,7 @@
                             Volunteer to plant saplings around your community on {{ event.date }}.
                         </p>
                     </div>
-                    <a href="{{ event.volunteer_link }}" class="button">Sign Up to Volunteer</a>
+                    <a href="#" class="button">Sign Up to Volunteer</a>
                 </div>
                 {% endif %}
                 <div class="card min2">
@@ -138,7 +138,7 @@
                     <h2>{{ tree.name }}</h2>
 
                     {% if tree.description_link != "NULL" %}
-                    <a href="{{ tree.description_link }}" class="button">Learn More</a>
+                    <a href="#" class="button">Learn More</a>
                     {% endif %}
                     {# <p>{{ tree.description }}</p> #}
                 </div>
