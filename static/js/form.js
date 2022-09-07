@@ -76,7 +76,7 @@ function add_host_field() {
     field_group.appendChild(uuid);
     field_group.appendChild(host_field('Name', 'text', 'host' + host_num + '_name', true, null, false));
     field_group.appendChild(host_field('Bio', 'text', 'host' + host_num + '_bio', true, null, false));
-    field_group.appendChild(host_field('Photo', 'text', 'host' + host_num + '_photo', false, null, false));
+    field_group.appendChild(host_field('Photo (Instructions <a target="_blank" href="../static/pdf/photo_instructions.pdf">here</a>)', 'text', 'host' + host_num + '_photo', false, null, false));
     field_group.lastChild.lastChild.setAttribute('onchange', 'openModalCheck(this);');
 
     var img_options_group = document.createElement('div');

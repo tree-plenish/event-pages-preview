@@ -81,7 +81,7 @@
                 <input id="host1-bio" type="text" class="form-control" name="host1_bio" placeholder="" required>
               </div>
               <div class="form-group">
-                <label>Photo</label>
+                <label>Photo (Instructions <a target="_blank" href="{{ url_for('static', filename='pdf/photo_instructions.pdf') }}">here</a>)</label>
                 <!-- <input type="file" class="form-control" name="host1_photo" placeholder=""> -->
                 <input id="host1-photo" type="text" class="form-control" name="host1_photo" placeholder="Enter Google Drive file ID" onchange="openModalCheck(this)">
                 <div class="inline-input-group">
