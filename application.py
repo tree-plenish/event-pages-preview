@@ -35,6 +35,8 @@ def index():
 @application.route("/form", methods=["GET", "POST"])
 def form():
     if request.method == "POST" and request.form:
+        if not request.form['password'].isdigit():
+            return render_template('login.html', error=True)
         result = login(int(request.form['schoolid']), int(request.form['password']))
         if result == "ready":
             # print(session.get('data'))
