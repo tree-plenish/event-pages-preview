@@ -30,7 +30,7 @@
         </h4>
         <div style="text-align: center">
             <a href="#" class="button" style="display: inline-block">Order a Sapling</a>
-            {% if not event.pickup_only %}
+            {% if not event.is_pickup_only %}
             <a href="#" class="button" style="display: inline-block">Volunteer</a>
             {% endif %}
         </div>
@@ -86,7 +86,7 @@
                 <div class="card min2 min4">
                     <div class="top">
                         <h3>Order a Sapling</h3>
-                        {% if not event.pickup_only %}
+                        {% if not event.is_pickup_only %}
                             <p>
                                 Order a sapling to be planted in your yard by volunteers
                                 or picked up on {{ event.date }}.
@@ -99,7 +99,7 @@
                     </div>
                     <a href="#" class="button">Order a Sapling</a>
                 </div>
-                {% if event.volunteer_link != 'NULL' and not event.pickup_only%}
+                {% if event.volunteer_link != 'NULL' and not event.is_pickup_only%}
                 <div class="card min2">
                     <div class="top">
                         <h3>Volunteer</h3>
