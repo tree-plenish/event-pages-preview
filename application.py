@@ -154,9 +154,9 @@ def process_data(form, files):
                 host['bio'] = form['host' + str(i) + '_bio']
                 host['form_photo'] = form['host' + str(i) + '_photo']
                 host['photo'] = 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
-                host['photo_x'] = form['host' + str(i) + '_photo_x']
-                host['photo_y'] = form['host' + str(i) + '_photo_y']
-                host['photo_zoom'] = form['host' + str(i) + '_photo_zoom']
+                host['photo_x'] = form['host' + str(i) + '_photo_x'] if form['host' + str(i) + '_photo'] != '' else 0
+                host['photo_y'] = form['host' + str(i) + '_photo_y'] if form['host' + str(i) + '_photo'] != '' else 0
+                host['photo_zoom'] = form['host' + str(i) + '_photo_zoom'] if form['host' + str(i) + '_photo'] != '' else 100
                 # host['primary'] = (i == 1)
         if not host_exists:
             data['hosts'].append({
