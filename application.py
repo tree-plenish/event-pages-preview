@@ -93,6 +93,7 @@ def login(schoolid, password):
         data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
         data['trees'] = []
         for host in data['hosts']:
+            host['display'] = True
             if host['photo'] == 'static/images/default_profile.png':
                 host['form_photo'] = ''
             elif 'https://drive.google.com/uc?export=view&id=' in host['photo']:
@@ -103,6 +104,12 @@ def login(schoolid, password):
                 host['photo_y'] = 0
             if type(host['photo_zoom']) == pd._libs.missing.NAType:
                 host['photo_zoom'] = 100
+        # make primary host first host
+        for i, host in enumerate(data['hosts']):
+            if host['is_primary']:
+                data['hosts'].insert(0, data['hosts'].pop(i))
+                break
+        print(data['hosts'])
         for index, row in tree_table.iterrows():
             if row['event_id'] == schoolid:
                 tree_info = {'name' : row['species'], 'image_link' : treeInfo[treeInfo['species'] == row['species']]['image_link'].values[0]}
