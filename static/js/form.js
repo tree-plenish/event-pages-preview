@@ -32,17 +32,19 @@ window.addEventListener('load', function() {
     }
     var host_num = 1;
     for (const host of data.hosts) {
-        if (!document.getElementById('host' + host_num + '-name')) {
-            add_host_field();
+        if (host.display) {
+            if (!document.getElementById('host' + host_num + '-name')) {
+                add_host_field();
+            }
+            document.getElementById('host' + host_num + '-name').value = host.name;
+            document.getElementById('host' + host_num + '-uuid').value = host.uuid;
+            document.getElementById('host' + host_num + '-bio').value = host.bio;
+            document.getElementById('host' + host_num + '-photo').value = host.form_photo;
+            document.getElementById('host' + host_num + '-photo-x').value = host.photo_x;
+            document.getElementById('host' + host_num + '-photo-y').value = host.photo_y;
+            document.getElementById('host' + host_num + '-photo-zoom').value = host.photo_zoom;
+            host_num++;
         }
-        document.getElementById('host' + host_num + '-name').value = host.name;
-        document.getElementById('host' + host_num + '-uuid').value = host.uuid;
-        document.getElementById('host' + host_num + '-bio').value = host.bio;
-        document.getElementById('host' + host_num + '-photo').value = host.form_photo;
-        document.getElementById('host' + host_num + '-photo-x').value = host.photo_x;
-        document.getElementById('host' + host_num + '-photo-y').value = host.photo_y;
-        document.getElementById('host' + host_num + '-photo-zoom').value = host.photo_zoom;
-        host_num++;
     }
     var tree_num = 1;
     for (const tree of data.trees) {

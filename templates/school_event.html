@@ -175,6 +175,7 @@
     <div class="centered">
         <div class="cards">
             {% for person in event.hosts %}
+                {% if person.display %}
                 <div class="card {{'min3' if event.host_names|length >= 3}} {{'min2' if event.host_names|length >= 2}}">
                     <div class="circleCropper" style="background-image: url({{ person.photo }}); background-size: {{ person.photo_zoom }}%; background-position: {{ person.photo_x }}px {{ person.photo_y }}px;">
                     </div>
@@ -184,8 +185,8 @@
                         <!-- <p>{{ person.phone }}</p>
                         <p>{{ person.email }}</p>-->
                     </div>
-                    
                 </div>
+                {% endif %}
             {% endfor %}
         </div>
     </div>

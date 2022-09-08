@@ -93,6 +93,7 @@ def login(schoolid, password):
         data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
         data['trees'] = []
         for host in data['hosts']:
+            host['display'] = True
             if host['photo'] == 'static/images/default_profile.png':
                 host['form_photo'] = ''
             elif 'https://drive.google.com/uc?export=view&id=' in host['photo']:
@@ -103,6 +104,12 @@ def login(schoolid, password):
                 host['photo_y'] = 0
             if type(host['photo_zoom']) == pd._libs.missing.NAType:
                 host['photo_zoom'] = 100
+        # make primary host first host
+        for i, host in enumerate(data['hosts']):
+            if host['is_primary']:
+                data['hosts'].insert(0, data['hosts'].pop(i))
+                break
+        print(data['hosts'])
         for index, row in tree_table.iterrows():
             if row['event_id'] == schoolid:
                 tree_info = {'name' : row['species'], 'image_link' : treeInfo[treeInfo['species'] == row['species']]['image_link'].values[0]}
@@ -113,7 +120,7 @@ def login(schoolid, password):
         return None
 
 def process_data(form, files):
-    # print(form)
+    print(form)
     # print(files)
     data = session.get('data')
     data['name'] = form['name']
@@ -144,12 +151,16 @@ def process_data(form, files):
     else:
         data['is_pickup_only'] = False
 
+
+    for host in data['hosts']:
+        host['display'] = False
     i = 1
     while 'host' + str(i) + '_name' in form:
         host_exists = False
         for host in data['hosts']:
             if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == form['host' + str(i) + '_uuid']:
                 host_exists = True
+                host['display'] = True
                 host['new'] = host['new'] if 'new' in host else False
                 host['bio'] = form['host' + str(i) + '_bio']
                 host['form_photo'] = form['host' + str(i) + '_photo']
@@ -157,10 +168,11 @@ def process_data(form, files):
                 host['photo_x'] = form['host' + str(i) + '_photo_x'] if form['host' + str(i) + '_photo'] != '' else 0
                 host['photo_y'] = form['host' + str(i) + '_photo_y'] if form['host' + str(i) + '_photo'] != '' else 0
                 host['photo_zoom'] = form['host' + str(i) + '_photo_zoom'] if form['host' + str(i) + '_photo'] != '' else 100
-                # host['primary'] = (i == 1)
+                host['primary'] = (i == 1)
         if not host_exists:
             data['hosts'].append({
                 'new' : True,
+                'display' : True,
                 'uuid' : new_host_uuid(),
                 'name' : form['host' + str(i) + '_name'],
                 'bio' : form['host' + str(i) + '_bio'],
@@ -168,8 +180,8 @@ def process_data(form, files):
                 'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
                 'photo_x': form['host' + str(i) + '_photo_x'],
                 'photo_y': form['host' + str(i) + '_photo_y'],
-                'photo_zoom': form['host' + str(i) + '_photo_zoom']
-                # 'primary' : i == 1
+                'photo_zoom': form['host' + str(i) + '_photo_zoom'],
+                'primary' : i == 1
             })
         i += 1
 
@@ -189,15 +201,15 @@ def submit_to_database(data):
         colLst=['id', 'name', 'state', 'media_type_video', 'bio', 'video', 'display_email', 'is_pickup_only'])
 
     for host in data['hosts']:
-        if 'new' in host:
+        if 'display' in host and host['display']:
             if host['new'] == True:
                 tpSQL.batchInsert('host', 
-                    [[host['uuid'], data['id'], host['name'], host['bio'], host['photo'], int(host['photo_x']), int(host['photo_y']), int(host['photo_zoom'])]], 
-                    colLst=['uuid', 'event_id', 'name', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
+                    [[host['uuid'], data['id'], host['primary'], host['name'], host['bio'], host['photo'], int(host['photo_x']), int(host['photo_y']), int(host['photo_zoom'])]], 
+                    colLst=['uuid', 'event_id', 'is_primary', 'name', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
             else:
                 tpSQL.batchUpdate2('host', 'uuid', 
-                    [[host['uuid'], data['id'], host['name'], host['bio'], host['photo'], int(host['photo_x']), int(host['photo_y']), int(host['photo_zoom'])]], 
-                    colLst=['uuid', 'event_id', 'name', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
+                    [[host['uuid'], data['id'], host['primary'], host['name'], host['bio'], host['photo'], int(host['photo_x']), int(host['photo_y']), int(host['photo_zoom'])]], 
+                    colLst=['uuid', 'event_id', 'is_primary', 'name', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
         else: 
             # host was in db before, but was deleted from form. Delete from db
             tpSQL.host_tbl_delete_row(host['uuid'])
