@@ -56,10 +56,10 @@ def preview():
     if request.method == "POST":
         session['data'] = process_data(request.form, request.files)
         # print(session.get('data'))
-        return render_template("event-page/school_event.html", event=session.get('data'), school=session.get('data')['name'])
+        return render_template(f"{session.get('function')}/preview.html", event=session.get('data'), school=session.get('data')['name'])
     return redirect('/')
 
-# submitted page
+# submitted page (event-page)
 @application.route("/submit", methods=["GET", "POST"])
 def submit():
     if request.method == "POST":
@@ -67,11 +67,19 @@ def submit():
         return render_template("event-page/submit.html")
     return redirect('/')
 
+# download as pdf (press-release)
+@application.route("/download_pdf", methods=["GET", "POST"])
+def download_pdf():
+    if request.method == "POST":
+        submit_to_database(session.get('data'))
+        return render_template("event-page/submit.html")
+    return redirect('/')
 
 # helper functions below:
 
 def login(schoolid, password, function):
     table = tpSQL.getTable('event').fillna(0).replace(['nan'], [''])
+    tree_table = tpSQL.getTable('tree')
     treeInfo = tpSQL.getTable('tree_info')
     if schoolid not in table['id'].values:
         return None
@@ -83,15 +91,20 @@ def login(schoolid, password, function):
         elif scheduler_info['submitted_tree_info'] and not scheduler_info['valid_species']:
             return 'wait'
 
+        data = table.set_index('id').T.to_dict()[schoolid]
+        data['form_date'] = str(data['date']).split()[0]
+        data['trees'] = []
+        for index, row in tree_table.iterrows():
+            if row['event_id'] == schoolid:
+                tree_info = {'name' : row['species'], 'image_link' : treeInfo[treeInfo['species'] == row['species']]['image_link'].values[0]}
+                data['trees'].append(tree_info)
+        
         if function == 'event-page':
-            data = table.set_index('id').T.to_dict()[schoolid]
-            data['form_date'] = str(data['date']).split()[0]
             data['display_video'] = data['video']
             data['id'] = schoolid
             host_table = tpSQL.getTable('host')
-            tree_table = tpSQL.getTable('tree')
             data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
-            data['trees'] = []
+            
             for host in data['hosts']:
                 host['display'] = True
                 if host['photo'] == 'static/images/default_profile.png':
@@ -110,14 +123,7 @@ def login(schoolid, password, function):
                     data['hosts'].insert(0, data['hosts'].pop(i))
                     break
             print(data['hosts'])
-            for index, row in tree_table.iterrows():
-                if row['event_id'] == schoolid:
-                    tree_info = {'name' : row['species'], 'image_link' : treeInfo[treeInfo['species'] == row['species']]['image_link'].values[0]}
-                    data['trees'].append(tree_info)
-        
-        else: # function == 'press-release'
-            data = {}
-        
+
         session['data'] = data
         session['function'] = function # event-page or press-release
 
@@ -127,7 +133,7 @@ def login(schoolid, password, function):
 
 def process_data(form, files):
     print(form)
-    # print(files)
+    
     data = session.get('data')
     data['name'] = form['name']
     data['state'] = form['state']
@@ -139,57 +145,61 @@ def process_data(form, files):
     data['date'] = date.strftime('%B %d, %Y').replace(" 0", " ")
     
     data['tree_goal'] = int(form['tree_goal'])
-    data['media_type_video'] = True if form['media_type'] == "Video" else False
-    data['bio'] = form['bio']
-    data['display_video'] = form['video']
-    if 'youtu.be' in data['display_video']:
-        data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('.be/',1)[1].split('&')[0]
-    elif 'youtube.com/watch?' in data['display_video']:
-        data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('/watch?v=',1)[1].split('&')[0]
-    elif 'drive.google.com' in data['display_video']:
-        data['video'] = data['display_video'].replace('view','preview')
+
+    if session.get('function') == 'event-page':
+        data['media_type_video'] = True if form['media_type'] == "Video" else False
+        data['bio'] = form['bio']
+        data['display_video'] = form['video']
+        if 'youtu.be' in data['display_video']:
+            data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('.be/',1)[1].split('&')[0]
+        elif 'youtube.com/watch?' in data['display_video']:
+            data['video'] = "https://www.youtube.com/embed/" + data['display_video'].split('/watch?v=',1)[1].split('&')[0]
+        elif 'drive.google.com' in data['display_video']:
+            data['video'] = data['display_video'].replace('view','preview')
 
 
-    data['display_email'] = form['display_email']
+        data['display_email'] = form['display_email']
 
-    if form['is_pickup_only'] == 'True':
-        data['is_pickup_only'] = True
-    else:
-        data['is_pickup_only'] = False
+        if form['is_pickup_only'] == 'True':
+            data['is_pickup_only'] = True
+        else:
+            data['is_pickup_only'] = False
 
 
-    for host in data['hosts']:
-        host['display'] = False
-    i = 1
-    while 'host' + str(i) + '_name' in form:
-        host_exists = False
         for host in data['hosts']:
-            if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == form['host' + str(i) + '_uuid']:
-                host_exists = True
-                host['display'] = True
-                host['new'] = host['new'] if 'new' in host else False
-                host['bio'] = form['host' + str(i) + '_bio']
-                host['form_photo'] = form['host' + str(i) + '_photo']
-                host['photo'] = 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
-                host['photo_x'] = form['host' + str(i) + '_photo_x'] if form['host' + str(i) + '_photo'] != '' else 0
-                host['photo_y'] = form['host' + str(i) + '_photo_y'] if form['host' + str(i) + '_photo'] != '' else 0
-                host['photo_zoom'] = form['host' + str(i) + '_photo_zoom'] if form['host' + str(i) + '_photo'] != '' else 100
-                host['primary'] = (i == 1)
-        if not host_exists:
-            data['hosts'].append({
-                'new' : True,
-                'display' : True,
-                'uuid' : new_host_uuid(),
-                'name' : form['host' + str(i) + '_name'],
-                'bio' : form['host' + str(i) + '_bio'],
-                'form_photo' : form['host' + str(i) + '_photo'],
-                'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
-                'photo_x': form['host' + str(i) + '_photo_x'],
-                'photo_y': form['host' + str(i) + '_photo_y'],
-                'photo_zoom': form['host' + str(i) + '_photo_zoom'],
-                'primary' : i == 1
-            })
-        i += 1
+            host['display'] = False
+        i = 1
+        while 'host' + str(i) + '_name' in form:
+            host_exists = False
+            for host in data['hosts']:
+                if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == form['host' + str(i) + '_uuid']:
+                    host_exists = True
+                    host['display'] = True
+                    host['new'] = host['new'] if 'new' in host else False
+                    host['bio'] = form['host' + str(i) + '_bio']
+                    host['form_photo'] = form['host' + str(i) + '_photo']
+                    host['photo'] = 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
+                    host['photo_x'] = form['host' + str(i) + '_photo_x'] if form['host' + str(i) + '_photo'] != '' else 0
+                    host['photo_y'] = form['host' + str(i) + '_photo_y'] if form['host' + str(i) + '_photo'] != '' else 0
+                    host['photo_zoom'] = form['host' + str(i) + '_photo_zoom'] if form['host' + str(i) + '_photo'] != '' else 100
+                    host['primary'] = (i == 1)
+            if not host_exists:
+                data['hosts'].append({
+                    'new' : True,
+                    'display' : True,
+                    'uuid' : new_host_uuid(),
+                    'name' : form['host' + str(i) + '_name'],
+                    'bio' : form['host' + str(i) + '_bio'],
+                    'form_photo' : form['host' + str(i) + '_photo'],
+                    'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
+                    'photo_x': form['host' + str(i) + '_photo_x'],
+                    'photo_y': form['host' + str(i) + '_photo_y'],
+                    'photo_zoom': form['host' + str(i) + '_photo_zoom'],
+                    'primary' : i == 1
+                })
+            i += 1
+    else: # session.get('function') == 'press-release':
+        data['town'] = form['town']
 
     return data
 

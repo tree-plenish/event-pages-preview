@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block navbar %}
+<div style="float:right;">
+    <form action="{{ url_for('form') }}" method="POST" enctype="multipart/form-data" style="display:inline">
+        <li class='action-button-wrapper'><button type="submit" class='action-button'>Edit</button></li>
+    </form>
+    <form action="{{ url_for('download_pdf') }}" method="POST" enctype="multipart/form-data" style="display:inline">
+        <li class='action-button-wrapper'><button type="submit" class='action-button'>Download as PDF</button></li>
+    </form>
+</div>
+{% endblock %}
+
+{% block head %}
+<title>{{ school }} | Tree-Plenish Events</title>
+{% endblock %}
+
+{% block body %}
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock %}

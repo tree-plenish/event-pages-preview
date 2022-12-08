@@ -1,7 +1,5 @@
 var tree_fields = document.getElementById('tree-fields');
 
-document.getElementById("host1-crop-button").onclick = function() { openModal(1); };
-
 window.addEventListener('load', function() {
     var tree_num = 1;
     for (const tree of data.trees) {
