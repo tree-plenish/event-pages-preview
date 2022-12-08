@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
+{% endblock %}
+{% block body %}
+<div class="form-body">
+    <div class="row">
+      <div class="col">
+  
+        <h1>Press Release Information</h1>
+        <hr>
+  
+        <form action="{{ url_for('preview') }}" method="POST" enctype="multipart/form-data">
+  
+          <div class="form-group">
+            <label>School Name</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Enter school name" value="{{ data.name }}" required>
+          </div>
+          <div class="form-group">
+            <label>Town Name</label>
+            <input type="text" class="form-control" id="town" name="town" placeholder="Enter town name" value="{{ data.town }}" required>
+          </div>
+          <div class="form-group">
+            <label>State Abbreviation</label>
+            <input type="text" class="form-control" id="state" name="state" placeholder="Enter state abbreviation" value="{{ data.state }}" required>
+          </div>
+          <div class="form-group">
+            <label>Event Date</label>
+            <input type="date" class="form-control" id="date" name="date" placeholder="Select event date" value="{{ data.form_date }}" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Sapling Goal</label>
+            <input type="number" class="form-control" id="tree_goal" name="tree_goal" placeholder="Enter tree goal" value="{{ data.tree_goal }}" readonly>
+          </div>
+
+          <div id="tree-fields">
+            <div class="form-group">
+              <label>Tree 1 Species</label>
+              <input id="tree1-species" type="text" class="form-control" name="tree1_species" placeholder="" required readonly>
+            </div>
+          </div>
+
+          <br>
+          <button type="submit">Next</button>
+  
+        </form>
+  
+      </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script type="text/javascript">
+    var data = JSON.parse('{{data | tojson}}');
+</script>
+<script src="{{ url_for('static', filename='js/press-release/form.js') }}"></script>
+{% endblock %}

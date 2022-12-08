@@ -37,10 +37,9 @@ def form():
     if request.method == "POST" and request.form:
         if not request.form['password'].isdigit():
             return render_template('login.html', error=True)
-        result = login(int(request.form['schoolid']), int(request.form['password']))
+        result = login(int(request.form['schoolid']), int(request.form['password']), request.form['function'])
         if result == "ready":
-            # print(session.get('data'))
-            return render_template('form.html', data=session.get('data'))
+            return render_template(f'{session.get("function")}/form.html', data=session.get('data'))
         elif result == "action":
            return render_template('login_error_action.html') 
         elif result == "wait":
@@ -48,7 +47,7 @@ def form():
         else:
             return render_template('login.html', error=True)
     elif request.method == "POST":
-        return render_template('form.html', data=session.get('data'))
+        return render_template(f'{session.get("function")}/form.html', data=session.get('data'))
     return redirect('/')
 
 # preview page
@@ -57,7 +56,7 @@ def preview():
     if request.method == "POST":
         session['data'] = process_data(request.form, request.files)
         # print(session.get('data'))
-        return render_template("school_event.html", event=session.get('data'), school=session.get('data')['name'])
+        return render_template("event-page/school_event.html", event=session.get('data'), school=session.get('data')['name'])
     return redirect('/')
 
 # submitted page
@@ -65,13 +64,13 @@ def preview():
 def submit():
     if request.method == "POST":
         submit_to_database(session.get('data'))
-        return render_template("submit.html")
+        return render_template("event-page/submit.html")
     return redirect('/')
 
 
 # helper functions below:
 
-def login(schoolid, password):
+def login(schoolid, password, function):
     table = tpSQL.getTable('event').fillna(0).replace(['nan'], [''])
     treeInfo = tpSQL.getTable('tree_info')
     if schoolid not in table['id'].values:
@@ -84,37 +83,44 @@ def login(schoolid, password):
         elif scheduler_info['submitted_tree_info'] and not scheduler_info['valid_species']:
             return 'wait'
 
-        data = table.set_index('id').T.to_dict()[schoolid]
-        data['form_date'] = str(data['date']).split()[0]
-        data['display_video'] = data['video']
-        data['id'] = schoolid
-        host_table = tpSQL.getTable('host')
-        tree_table = tpSQL.getTable('tree')
-        data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
-        data['trees'] = []
-        for host in data['hosts']:
-            host['display'] = True
-            if host['photo'] == 'static/images/default_profile.png':
-                host['form_photo'] = ''
-            elif 'https://drive.google.com/uc?export=view&id=' in host['photo']:
-                host['form_photo'] = host['photo'].split('https://drive.google.com/uc?export=view&id=')[1]
-            if type(host['photo_x']) == pd._libs.missing.NAType:
-                host['photo_x'] = 0
-            if type(host['photo_y']) == pd._libs.missing.NAType:
-                host['photo_y'] = 0
-            if type(host['photo_zoom']) == pd._libs.missing.NAType:
-                host['photo_zoom'] = 100
-        # make primary host first host
-        for i, host in enumerate(data['hosts']):
-            if host['is_primary']:
-                data['hosts'].insert(0, data['hosts'].pop(i))
-                break
-        print(data['hosts'])
-        for index, row in tree_table.iterrows():
-            if row['event_id'] == schoolid:
-                tree_info = {'name' : row['species'], 'image_link' : treeInfo[treeInfo['species'] == row['species']]['image_link'].values[0]}
-                data['trees'].append(tree_info)
+        if function == 'event-page':
+            data = table.set_index('id').T.to_dict()[schoolid]
+            data['form_date'] = str(data['date']).split()[0]
+            data['display_video'] = data['video']
+            data['id'] = schoolid
+            host_table = tpSQL.getTable('host')
+            tree_table = tpSQL.getTable('tree')
+            data['hosts'] = host_table[host_table['event_id'] == schoolid].to_dict('records')
+            data['trees'] = []
+            for host in data['hosts']:
+                host['display'] = True
+                if host['photo'] == 'static/images/default_profile.png':
+                    host['form_photo'] = ''
+                elif 'https://drive.google.com/uc?export=view&id=' in host['photo']:
+                    host['form_photo'] = host['photo'].split('https://drive.google.com/uc?export=view&id=')[1]
+                if type(host['photo_x']) == pd._libs.missing.NAType:
+                    host['photo_x'] = 0
+                if type(host['photo_y']) == pd._libs.missing.NAType:
+                    host['photo_y'] = 0
+                if type(host['photo_zoom']) == pd._libs.missing.NAType:
+                    host['photo_zoom'] = 100
+            # make primary host first host
+            for i, host in enumerate(data['hosts']):
+                if host['is_primary']:
+                    data['hosts'].insert(0, data['hosts'].pop(i))
+                    break
+            print(data['hosts'])
+            for index, row in tree_table.iterrows():
+                if row['event_id'] == schoolid:
+                    tree_info = {'name' : row['species'], 'image_link' : treeInfo[treeInfo['species'] == row['species']]['image_link'].values[0]}
+                    data['trees'].append(tree_info)
+        
+        else: # function == 'press-release'
+            data = {}
+        
         session['data'] = data
+        session['function'] = function # event-page or press-release
+
         return 'ready'
     else:
         return None

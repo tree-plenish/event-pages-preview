@@ -39,7 +39,7 @@
           </div>
 
           <div class="form-group">
-            <label>Tree Goal</label>
+            <label>Sapling Goal</label>
             <input type="number" class="form-control" id="tree_goal" name="tree_goal" placeholder="Enter tree goal" value="{{ data.tree_goal }}" readonly>
           </div>
 
@@ -152,5 +152,5 @@
 <script type="text/javascript">
     var data = JSON.parse('{{data | tojson}}');
 </script>
-<script src="{{ url_for('static', filename='js/form.js') }}"></script>
+<script src="{{ url_for('static', filename='js/event-page/form.js') }}"></script>
 {% endblock %}
