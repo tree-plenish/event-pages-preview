@@ -1,5 +1,8 @@
 from flask import Flask, render_template, request, redirect, session, send_file
+
+import shutil
 import tempfile
+import weakref
 
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -27,13 +30,27 @@ application.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
 
 tpSQL = TpSQL(schema='tp2022')
 
+class FileRemover(object):
+    def __init__(self):
+        self.weak_references = dict()  # weak_ref -> filepath to remove
+
+    def cleanup_once_done(self, response, filepath):
+        wr = weakref.ref(response, self._do_cleanup)
+        self.weak_references[wr] = filepath
+
+    def _do_cleanup(self, wr):
+        filepath = self.weak_references[wr]
+        print('Deleting %s' % filepath)
+        shutil.rmtree(filepath, ignore_errors=True)
+file_remover = FileRemover()
+
 # login page
 @application.route('/index')
 @application.route('/')
 def index():
     return render_template("login.html", error=False)
 
-# event info form
+# form
 @application.route("/form", methods=["GET", "POST"])
 def form():
     if request.method == "POST" and request.form:
@@ -52,24 +69,18 @@ def form():
         return render_template(f'{session.get("function")}/form.html', data=session.get('data'))
     return redirect('/')
 
-# preview page
+# preview page (event-page)
 @application.route("/preview", methods=["GET", "POST"])
 def preview():
-    if request.method == "POST":
+    if request.method == "POST" and session.get('function') == 'event-page':
         session['data'] = process_data(request.form, request.files)
-        # print(session.get('data'))
-        if session.get('function') == 'event-page':
-            return render_template(f"{session.get('function')}/preview.html", event=session.get('data'), school=session.get('data')['name'])
-        else:
-            write_press_release(session.get('data'))
-            return render_template(f"{session.get('function')}/preview.html", school=session.get('data')['name'])
-
+        return render_template(f"{session.get('function')}/preview.html", event=session.get('data'), school=session.get('data')['name'])
     return redirect('/')
 
 # submitted page (event-page)
 @application.route("/submit", methods=["GET", "POST"])
 def submit():
-    if request.method == "POST":
+    if request.method == "POST" and session.get('function') == 'event-page':
         submit_to_database(session.get('data'))
         return render_template("event-page/submit.html")
     return redirect('/')
@@ -77,10 +88,13 @@ def submit():
 # download as pdf (press-release)
 @application.route("/download_pdf", methods=["GET", "POST"])
 def download_pdf():
-    if request.method == "POST":
-        convert_html_to_pdf('templates/press-release/press_release.html', 'press_release.pdf')
-        return send_file('out.pdf', as_attachment=True)
-    return redirect('preview')
+    if request.method == "POST" and session.get('function') == 'press-release':
+        tempdir = tempfile.mkdtemp()
+        convert_html_to_pdf(write_press_release(session.get('data')), f'{tempdir}/press_release.pdf')
+        response = send_file(f'{tempdir}/press_release.pdf', as_attachment=True)
+        file_remover.cleanup_once_done(response, tempdir)
+        return response
+    return redirect('/')
 
 # helper functions below:
 
@@ -245,9 +259,7 @@ def submit_to_database(data):
     # print(tpSQL.getTable('event'))
 
 def write_press_release(data):
-    with open('templates/press-release/press_release.html', 'w') as f:
-        f.write(
-            f'''
+    return f'''
             <h1>
             {data['name']} Students Partner with Tree-Plenish to Offset Their School’s Energy Consumption 
             by Planting Saplings
@@ -293,12 +305,9 @@ def write_press_release(data):
             from {data['name']}, Tree-Plenish hopes to drive [Enter Town Name] towards a sustainable future. 
             </p >
             '''
-        )
 
-def convert_html_to_pdf(source_filename, output_filename):
-    with open(source_filename, 'r') as f:
-        source_html = f.read()
 
+def convert_html_to_pdf(source_html, output_filename):
     # open output file for writing (truncated binary)
     result_file = open(output_filename, "w+b")
 
@@ -315,4 +324,3 @@ def convert_html_to_pdf(source_filename, output_filename):
 
 if __name__ == "__main__":
     application.run()
-
