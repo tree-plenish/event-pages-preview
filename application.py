@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, send_file
+import tempfile
 
 import datetime
 from dateutil.relativedelta import relativedelta
@@ -9,6 +10,7 @@ import importlib
 import pandas as pd
 from random import randrange
 import uuid
+from xhtml2pdf import pisa
 
 # Add parent directory to PYTHONPATH to be able to find package.
 file = Path(__file__).resolve()
@@ -56,7 +58,12 @@ def preview():
     if request.method == "POST":
         session['data'] = process_data(request.form, request.files)
         # print(session.get('data'))
-        return render_template(f"{session.get('function')}/preview.html", event=session.get('data'), school=session.get('data')['name'])
+        if session.get('function') == 'event-page':
+            return render_template(f"{session.get('function')}/preview.html", event=session.get('data'), school=session.get('data')['name'])
+        else:
+            write_press_release(session.get('data'))
+            return render_template(f"{session.get('function')}/preview.html", school=session.get('data')['name'])
+
     return redirect('/')
 
 # submitted page (event-page)
@@ -71,9 +78,9 @@ def submit():
 @application.route("/download_pdf", methods=["GET", "POST"])
 def download_pdf():
     if request.method == "POST":
-        submit_to_database(session.get('data'))
-        return render_template("event-page/submit.html")
-    return redirect('/')
+        convert_html_to_pdf('templates/press-release/press_release.html', 'press_release.pdf')
+        return send_file('out.pdf', as_attachment=True)
+    return redirect('preview')
 
 # helper functions below:
 
@@ -236,6 +243,75 @@ def submit_to_database(data):
                     colLst=['event_id', 'submitted_epf']) 
     
     # print(tpSQL.getTable('event'))
+
+def write_press_release(data):
+    with open('templates/press-release/press_release.html', 'w') as f:
+        f.write(
+            f'''
+            <h1>
+            {data['name']} Students Partner with Tree-Plenish to Offset Their School’s Energy Consumption 
+            by Planting Saplings
+            </h1>
+            <p style="text-align: left; font-size: 1.5em; font-style: italic">
+            Calling {data['town'].upper()} residents to action
+            </p>
+            <p style="text-align: left">
+            {data['town'].upper()}, {data['state']} ({data['date']}) -- This year, students from 
+            {data['name']} are partnering with the nonprofit <a href="https://www.tree-plenish.org/">Tree-Plenish</a> to help make their 
+            community more sustainable. They plan to plant {data['tree_goal']} saplings on {data['date']} 
+            to offset their school’s energy consumption from the past academic year.
+            </p>
+            <p style="text-align: left">
+            Tree-Plenish mentors students through a step-by-step process to achieve their ultimate goal: 
+            hosting their own tree-planting event to help offset the carbon their school emits in an academic 
+            year. With the help of Tree-Plenish, students calculate their school’s energy consumption to 
+            determine their sapling goal. In order to reach their goal number of saplings, students rely on 
+            residents of the community to order saplings to be planted by volunteers in their yard.
+            </p>
+            <p style="text-align: left">
+            Throughout the fall and early winter, students from {data['name']} have been planning their 
+            tree-planting event. They are now starting to market their event to the community, with the 
+            goal of getting residents to order a sapling to be planted in their yard on the day of the event. 
+            Students will also reach out to their community to recruit volunteers to help plant saplings on 
+            the day of the event. These events are a perfect opportunity for members of the community to connect 
+            with each other and think about sustainability in their community. 
+            </p>
+            <p style="text-align: left">
+            Residents of the community are able to help support the event starting now! They can order a sapling 
+            to be planted in their yard or sign up to volunteer to plant saplings on the day of the event. Saplings 
+            are [Enter Sapling Price] and residents can choose between {[t['name'] for t in data['trees']]} saplings. The more residents 
+            that request saplings, the faster the students are able to reach their goal. If residents are unable to 
+            order a sapling or volunteer their time, they can also make a monetary contribution on the Tree-Plenish 
+            website to help support future tree-planting events.
+            </p>
+            <p style="text-align: left">
+            [Enter a short quote from an event leader talking about why you are hosting your event]
+            </p>
+            <p style="text-align: left">
+            Tree-Plenish is a student-led 501(c)(3) non profit organization with the mission of empowering students 
+            to create a more sustainable and equitable future through community tree-planting. Together with students 
+            from {data['name']}, Tree-Plenish hopes to drive [Enter Town Name] towards a sustainable future. 
+            </p >
+            '''
+        )
+
+def convert_html_to_pdf(source_filename, output_filename):
+    with open(source_filename, 'r') as f:
+        source_html = f.read()
+
+    # open output file for writing (truncated binary)
+    result_file = open(output_filename, "w+b")
+
+    # convert HTML to PDF
+    pisa_status = pisa.CreatePDF(
+            source_html,                # the HTML to convert
+            dest=result_file)           # file handle to recieve result
+
+    # close output file
+    result_file.close()                 # close output file
+
+    # return False on success and True on errors
+    return pisa_status.err
 
 if __name__ == "__main__":
     application.run()

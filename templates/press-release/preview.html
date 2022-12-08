@@ -12,11 +12,14 @@
 {% endblock %}
 
 {% block head %}
-<title>{{ school }} | Tree-Plenish Events</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/press-release.css') }}">
+<title>{{ school }} | Press Release Preview </title>
 {% endblock %}
 
 {% block body %}
-
+<div class="press-release">
+    {% include 'press-release/press_release.html' %}
+</div>
 {% endblock %}
 
 {% block scripts %}
