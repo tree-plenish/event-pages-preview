@@ -14,6 +14,7 @@ import pandas as pd
 from random import randrange
 import uuid
 from xhtml2pdf import pisa
+import base64
 
 # Add parent directory to PYTHONPATH to be able to find package.
 file = Path(__file__).resolve()
@@ -145,6 +146,8 @@ def login(schoolid, password, function):
                     data['hosts'].insert(0, data['hosts'].pop(i))
                     break
             print(data['hosts'])
+        else:
+            data['pr_date'] = datetime.date.today()
 
         session['data'] = data
         session['function'] = function # event-page or press-release
@@ -223,6 +226,7 @@ def process_data(form, files):
     else: # session.get('function') == 'press-release':
         data['town'] = form['town']
         data['quote'] = form['quote']
+        data['pr_date'] = datetime.datetime.strptime(form['pr_date'], '%Y-%m-%d').date().strftime('%B %d, %Y').replace(" 0", " ")
 
     return data
 
@@ -271,7 +275,29 @@ def write_press_release(data):
     else:
         species_string = ', '.join(species[:-1]) + ', and ' + species[-1]
 
+    with open("static/images/favicon.png", "rb") as f:
+        logo_binary = base64.b64encode(f.read())
+
     return f'''
+    <html>
+    <head>
+    <style>
+    body{{
+        font-size: 1.5em;
+        font-family: serif;
+        margin: 40px;
+    }}
+    </style>
+    </head>
+    <body>
+        <table>
+    <tr>
+        <td width=50%><img src="data:image/gif;base64,{logo_binary}" width=120px height=120px style="float:left"></td>
+        <td width=50%><p style="text-align:right">Caroline Sprenkle<br>
+        Media Relations<br>
+        marketing@tree-plenish.org</td></p>
+    </tr>
+</table>
         <h1>
         {data['name']} Students Partner with Tree-Plenish to Offset Their School’s Energy Consumption 
         by Planting Saplings
@@ -280,7 +306,7 @@ def write_press_release(data):
         Calling {data['town']} residents to action
         </h3>
         <p>
-        {data['town'].upper()}, {data['state']} ({datetime.date.today().strftime("%b %d, %Y")}) -- This year, students from 
+        {data['town'].upper()}, {data['state']} ({data['pr_date']}) -- This year, students from 
         {data['name']} are partnering with the nonprofit <a href="https://www.tree-plenish.org/">Tree-Plenish</a> to help make their 
         community more sustainable. They plan to plant {data['tree_goal']} saplings on {data['date']} 
         to offset their school’s energy consumption from the past academic year.
@@ -316,6 +342,8 @@ def write_press_release(data):
         to create a more sustainable and equitable future through community tree-planting. Together with students 
         from {data['name']}, Tree-Plenish hopes to drive {data['town']} towards a sustainable future. 
         </p >
+    </body
+    </html>
         '''
 
 
