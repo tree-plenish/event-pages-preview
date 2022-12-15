@@ -141,10 +141,10 @@ def login(schoolid, password, function):
                 if type(host['photo_zoom']) == pd._libs.missing.NAType:
                     host['photo_zoom'] = 100
             # make primary host first host
-            for i, host in enumerate(data['hosts']):
-                if host['is_primary']:
-                    data['hosts'].insert(0, data['hosts'].pop(i))
-                    break
+            # for i, host in enumerate(data['hosts']):
+            #     if host['is_primary']:
+            #         data['hosts'].insert(0, data['hosts'].pop(i))
+            #         break
             print(data['hosts'])
         else:
             data['pr_date'] = datetime.date.today()
@@ -201,6 +201,7 @@ def process_data(form, files):
                     host_exists = True
                     host['display'] = True
                     host['new'] = host['new'] if 'new' in host else False
+                    host['name'] = form['host' + str(i) + '_name']
                     host['bio'] = form['host' + str(i) + '_bio']
                     host['form_photo'] = form['host' + str(i) + '_photo']
                     host['photo'] = 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
@@ -223,6 +224,14 @@ def process_data(form, files):
                     'primary' : i == 1
                 })
             i += 1
+        
+        # reorder uuids to keep host order
+        print(data['hosts'])
+        uuids = [host['uuid'] for host in data['hosts']]
+        uuids.sort()
+        for i, host in enumerate(data['hosts']):
+            host['uuid'] = uuids[i]
+
     else: # session.get('function') == 'press-release':
         data['town'] = form['town']
         data['quote'] = form['quote']
@@ -290,14 +299,14 @@ def write_press_release(data):
     </style>
     </head>
     <body>
-        <table>
+    <table>
     <tr>
         <td width=50%><img src="data:image/gif;base64,{logo_binary}" width=120px height=120px style="float:left"></td>
         <td width=50%><p style="text-align:right">Caroline Sprenkle<br>
         Media Relations<br>
         marketing@tree-plenish.org</td></p>
     </tr>
-</table>
+    </table>
         <h1>
         {data['name']} Students Partner with Tree-Plenish to Offset Their School’s Energy Consumption 
         by Planting Saplings
