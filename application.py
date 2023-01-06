@@ -156,6 +156,10 @@ def login(schoolid, password, function):
     else:
         return None
 
+@application.errorhandler(500)
+def page_not_found(e):
+    return render_template('500.html'), 500
+
 def process_data(form, files):
     print(form)
     
@@ -200,7 +204,6 @@ def process_data(form, files):
                 if form['host' + str(i) + '_uuid'] != "" and host['uuid'] == form['host' + str(i) + '_uuid']:
                     host_exists = True
                     host['display'] = True
-                    host['new'] = host['new'] if 'new' in host else False
                     host['name'] = form['host' + str(i) + '_name']
                     host['bio'] = form['host' + str(i) + '_bio']
                     host['form_photo'] = form['host' + str(i) + '_photo']
@@ -211,7 +214,6 @@ def process_data(form, files):
                     host['primary'] = (i == 1)
             if not host_exists:
                 data['hosts'].append({
-                    'new' : True,
                     'display' : True,
                     'uuid' : new_host_uuid(),
                     'name' : form['host' + str(i) + '_name'],
@@ -252,9 +254,11 @@ def submit_to_database(data):
         [[data['id'], data['name'], data['state'], data['media_type_video'], data['bio'], data['video'], data['display_email'], data['is_pickup_only']]], 
         colLst=['id', 'name', 'state', 'media_type_video', 'bio', 'video', 'display_email', 'is_pickup_only'])
 
+    existing_host_uuids = tpSQL.getColData('host', ['uuid']).values
+
     for host in data['hosts']:
         if 'display' in host and host['display']:
-            if host['new'] == True:
+            if host['uuid'] not in existing_host_uuids:
                 tpSQL.batchInsert('host', 
                     [[host['uuid'], data['id'], host['primary'], host['name'], host['bio'], host['photo'], int(host['photo_x']), int(host['photo_y']), int(host['photo_zoom'])]], 
                     colLst=['uuid', 'event_id', 'is_primary', 'name', 'bio', 'photo', 'photo_x', 'photo_y', 'photo_zoom']) 
