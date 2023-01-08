@@ -191,7 +191,7 @@ confirmImage.onclick = function() {
     modalImageError.style.display = 'none';
     document.getElementById("host" + activeImgIdx + "-photo-x").value = modalImage.style['background-position-x'].replace('px', '');
     document.getElementById("host" + activeImgIdx + "-photo-y").value = modalImage.style['background-position-y'].replace('px', '');
-    document.getElementById("host" + activeImgIdx + "-photo-zoom").value = modalImage.style['background-size'].replace('%', '');
+    document.getElementById("host" + activeImgIdx + "-photo-zoom").value = modalImage.style['background-size'].replace('%', '').split(" ")[0];
 }
 
 spanError.onclick = function() {
