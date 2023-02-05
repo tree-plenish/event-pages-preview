@@ -28,6 +28,8 @@ from tech_team_database.dependencies.DatabaseSQLOperations import TpSQL
 
 application = Flask(__name__)
 application.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
+application.config['SESSION_TYPE'] = 'filesystem'
+application.config['SESSION_PERMANENT'] = False
 
 tpSQL = TpSQL(schema='tp2022')
 
