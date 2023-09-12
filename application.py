@@ -29,7 +29,7 @@ from tech_team_database.dependencies.DatabaseSQLOperations import TpSQL
 application = Flask(__name__)
 application.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
 
-tpSQL = TpSQL(schema='tp2022')
+tpSQL = TpSQL(schema='tp2023')
 
 class FileRemover(object):
     def __init__(self):
