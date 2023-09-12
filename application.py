@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, session, send_file
+from flask_session import Session
 
 import shutil
 import tempfile
@@ -6,6 +7,7 @@ import weakref
 
 import datetime
 from dateutil.relativedelta import relativedelta
+from datetime import timedelta
 from pathlib import Path
 import sys
 import os
@@ -28,6 +30,13 @@ from tech_team_database.dependencies.DatabaseSQLOperations import TpSQL
 
 application = Flask(__name__)
 application.config['SECRET_KEY'] = os.environ.get('FLASK_SECRET_KEY')
+application.config['SESSION_TYPE'] = 'filesystem'
+application.config['SESSION_PERMANENT'] = False
+application.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
+
+
+application.config.from_object(__name__)
+Session(application)
 
 tpSQL = TpSQL(schema='tp2023')
 
