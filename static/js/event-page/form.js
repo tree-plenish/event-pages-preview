@@ -173,10 +173,10 @@ function openModal(i) {
     imgId = document.getElementById("host" + i + "-photo").value;
     activeImgIdx = i;
     if (imgId != '') {
-        imageTester.src = "https://drive.google.com/uc?export=view&id=" + imgId;
+        imageTester.src = "https://drive.google.com/thumbnail?export=view&id=" + imgId;
         modal.style.display = "block";
 
-        modalImage.style['background-image'] = "url(https://drive.google.com/uc?export=view&id=" + imgId + ")";
+        modalImage.style['background-image'] = "url(https://drive.google.com/thumbnail?export=view&id=" + imgId + ")";
         modalImage.style['background-position-x'] = document.getElementById("host" + i + "-photo-x").value + 'px';
         modalImage.style['background-position-y'] = document.getElementById("host" + i + "-photo-y").value + 'px';
         modalImage.style['background-size'] = document.getElementById("host" + i + "-photo-zoom").value + '%';
