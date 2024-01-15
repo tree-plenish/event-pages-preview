@@ -141,8 +141,8 @@ def login(schoolid, password, function):
                 host['display'] = True
                 if host['photo'] == 'static/images/default_profile.png':
                     host['form_photo'] = ''
-                elif 'https://drive.google.com/uc?export=view&id=' in host['photo']:
-                    host['form_photo'] = host['photo'].split('https://drive.google.com/uc?export=view&id=')[1]
+                elif 'https://drive.google.com/thumbnail?export=view&id=' in host['photo']:
+                    host['form_photo'] = host['photo'].split('https://drive.google.com/thumbnail?export=view&id=')[1]
                 if type(host['photo_x']) == pd._libs.missing.NAType:
                     host['photo_x'] = 0
                 if type(host['photo_y']) == pd._libs.missing.NAType:
@@ -216,7 +216,7 @@ def process_data(form, files):
                     host['name'] = form['host' + str(i) + '_name']
                     host['bio'] = form['host' + str(i) + '_bio']
                     host['form_photo'] = form['host' + str(i) + '_photo']
-                    host['photo'] = 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
+                    host['photo'] = 'https://drive.google.com/thumbnail?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png'
                     host['photo_x'] = form['host' + str(i) + '_photo_x'] if form['host' + str(i) + '_photo'] != '' else 0
                     host['photo_y'] = form['host' + str(i) + '_photo_y'] if form['host' + str(i) + '_photo'] != '' else 0
                     host['photo_zoom'] = form['host' + str(i) + '_photo_zoom'] if form['host' + str(i) + '_photo'] != '' else 100
@@ -228,7 +228,7 @@ def process_data(form, files):
                     'name' : form['host' + str(i) + '_name'],
                     'bio' : form['host' + str(i) + '_bio'],
                     'form_photo' : form['host' + str(i) + '_photo'],
-                    'photo': 'https://drive.google.com/uc?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
+                    'photo': 'https://drive.google.com/thumbnail?export=view&id=' + form['host' + str(i) + '_photo'] if form['host' + str(i) + '_photo'] != '' else 'static/images/default_profile.png',
                     'photo_x': form['host' + str(i) + '_photo_x'],
                     'photo_y': form['host' + str(i) + '_photo_y'],
                     'photo_zoom': form['host' + str(i) + '_photo_zoom'],
