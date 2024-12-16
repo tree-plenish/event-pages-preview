@@ -38,7 +38,7 @@ application.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=5)
 application.config.from_object(__name__)
 Session(application)
 
-tpSQL = TpSQL(schema='tp2023')
+tpSQL = TpSQL(schema='tp2024')
 
 class FileRemover(object):
     def __init__(self):
